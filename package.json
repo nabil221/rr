@@ -24,6 +24,7 @@
     "test": "npm run test -w @local-stack-proof/web && cargo test --workspace",
     "test:postgres": "cargo test -p local-stack-proof-persistence-postgres -- --ignored",
     "test:e2e": "npm run test:e2e -w @local-stack-proof/web",
+    "validate:local": "npm run validate && npm run test:postgres && npm run test:e2e",
     "contract:generate": "cargo run -p local-stack-proof-transport-http --bin api-contract -- --write",
     "contract:check": "cargo run -p local-stack-proof-transport-http --bin api-contract -- --check",
     "typecheck": "npm run typecheck -w @local-stack-proof/web",

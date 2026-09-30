@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ApiError, type RunClient, type RunDto } from "./api";
-import { detailLink } from "./routes";
+import { detailLink, navigateToRun } from "./routes";
 import { ErrorNotice, Loading } from "./ui";
 export function RunsScreen({ client }: { client: RunClient }) {
   const [runs, setRuns] = useState<RunDto[]>([]);
@@ -92,7 +92,7 @@ export function NewRunScreen({ client }: { client: RunClient }) {
         },
         controller.signal,
       );
-      if (!controller.signal.aborted) window.location.hash = detailLink(run.id);
+      if (!controller.signal.aborted) navigateToRun(run.id);
     } catch (failure) {
       if (!controller.signal.aborted) setError(failure);
     } finally {

@@ -16,3 +16,7 @@ export function parseRoute(hash: string): Route {
   return { kind: "missing" };
 }
 export const detailLink = (id: string) => `#/runs/${encodeURIComponent(id)}`;
+
+export function navigateToRun(id: string) {
+  window.location.hash = detailLink(id);
+}

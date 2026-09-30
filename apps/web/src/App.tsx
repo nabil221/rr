@@ -15,7 +15,13 @@ export function App({
   client?: RunClient;
   initialRoute?: Route;
 }) {
-  const [client] = useState(() => suppliedClient ?? createClient());
+  const [client] = useState(() => {
+    try {
+      return suppliedClient ?? createClient();
+    } catch {
+      return null;
+    }
+  });
   const [route, setRoute] = useState<Route>(
     () => initialRoute ?? parseRoute(window.location.hash),
   );
@@ -24,6 +30,16 @@ export function App({
     window.addEventListener("hashchange", navigate);
     return () => window.removeEventListener("hashchange", navigate);
   }, []);
+  if (!client)
+    return (
+      <main className="page-shell">
+        <h1>Local configuration needs attention</h1>
+        <p role="alert">
+          Check the API endpoint setting. Only credential-free loopback HTTP
+          roots are accepted.
+        </p>
+      </main>
+    );
   return (
     <main className="page-shell">
       <header className="page-header">

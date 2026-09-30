@@ -21,6 +21,7 @@ vi.mock("@tauri-apps/api/core", () => ({
 describe("local API client", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
     vi.mocked(isTauri).mockReturnValue(false);
   });
@@ -36,6 +37,14 @@ describe("local API client", () => {
       "http://127.0.0.1:3000/?secret=x",
     ])
       expect(() => localApiRoot(value)).toThrow();
+  });
+
+  it("fails safely on invalid configured endpoints without exposing their contents", () => {
+    vi.stubEnv("VITE_API_BASE_URL", "http://secret:password@example.com");
+    const html = renderToStaticMarkup(<App initialRoute={{ kind: "runs" }} />);
+    expect(html).toContain("Local configuration needs attention");
+    expect(html).not.toContain("password");
+    expect(html).not.toContain("example.com");
   });
 
   it("loads detail and safe diagnostics through the selected client", async () => {

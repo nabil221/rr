@@ -2,18 +2,18 @@
 
 Update this document as issues are completed. A claim is not proven until it has a repeatable local check or a documented demo observation.
 
-| Claim                               | In-memory web          | In-memory desktop      | Browser/Postgres | Persistent desktop | Evidence / command                                   | Status       |
-| ----------------------------------- | ---------------------- | ---------------------- | ---------------- | ------------------ | ---------------------------------------------------- | ------------ |
-| Workspace quality gates             | proven                 | proven                 | proven           | proven             | `npm run validate`; DET-001                          | proven       |
-| Shared Rust domain/application code | proven                 | proven                 | proven via HTTP  | pending            | M2-02; M3-01/M3-02 shared service + Postgres         | partial      |
-| Frontend-to-backend interaction     | proven in Chrome UI    | proven in native UI    | pending          | pending            | M1-04 Chrome; M2-04 production Tauri UI walkthrough  | partial      |
-| Create, execute, and read run       | proven                 | proven                 | proven via HTTP  | pending            | M1-04; M2-04; M3-02 real HTTP success/readback       | partial      |
-| Controlled validation failure       | proven                 | proven                 | proven via HTTP  | pending            | M1-04; M2-04; M3-02 real HTTP rejection              | partial      |
-| Persistence after restart           | n/a (in-memory)        | n/a (in-memory)        | API proven       | pending            | M3-01 reconnect; M3-02 API process restart readback  | partial      |
-| HTTP contract/type alignment        | proven shared contract | proven shared contract | proven           | n/a                | M3-03 generated DTOs; drift experiment; validate     | proven       |
-| Desktop works without API/Postgres  | n/a                    | proven                 | n/a              | pending            | M2-02 spike and M2-04 native UI; API/Vite/DB stopped | partial      |
-| Windows packaged-build smoke path   | n/a                    | n/a                    | n/a              | pending            |                                                      | pending      |
-| PWA installability, optional        | n/a                    | n/a                    | pending          | n/a                |                                                      | not selected |
+| Claim                               | In-memory web          | In-memory desktop      | Browser/Postgres  | Persistent desktop | Evidence / command                                   | Status       |
+| ----------------------------------- | ---------------------- | ---------------------- | ----------------- | ------------------ | ---------------------------------------------------- | ------------ |
+| Workspace quality gates             | proven                 | proven                 | proven            | pending            | `npm run validate:local`; DET-001/002                | partial      |
+| Shared Rust domain/application code | proven                 | proven                 | proven in browser | pending            | M2-02; M3 persistence; M4 real browser flows         | partial      |
+| Frontend-to-backend interaction     | proven in Chrome UI    | M2 native baseline     | proven in browser | pending            | M1-04; M2-04; M4-04 local browser automation         | partial      |
+| Create, execute, and read run       | proven                 | M2 native baseline     | proven in browser | pending            | M1-04; M2-04; M4-02/03/04 UI workflows               | partial      |
+| Controlled validation failure       | proven                 | M2 native baseline     | proven in browser | pending            | M1-04; M2-04; M4-04 rejection/input preservation     | partial      |
+| Persistence after restart           | n/a (in-memory)        | n/a (in-memory)        | API proven        | pending            | M3-01 reconnect; M3-02 API process restart readback  | partial      |
+| HTTP contract/type alignment        | proven shared contract | proven shared contract | proven            | n/a                | M3-03 generated DTOs; drift experiment; validate     | proven       |
+| Desktop works without API/Postgres  | n/a                    | proven                 | n/a               | pending            | M2-02 spike and M2-04 native UI; API/Vite/DB stopped | partial      |
+| Windows packaged-build smoke path   | n/a                    | n/a                    | n/a               | pending            |                                                      | pending      |
+| PWA installability, optional        | n/a                    | n/a                    | pending           | n/a                |                                                      | not selected |
 
 ## M3 adapter evidence
 
@@ -40,7 +40,7 @@ imported by the shared web/native client. An incompatible temporary Rust field r
 failed the check; reverting it restored a pass. Aggregate validation includes
 contract checking before TypeScript and passes with 29 Rust tests and 5 client tests.
 The three live database tests also pass. No runtime JSON validator or OpenAPI SDK
-is claimed. All M3 issues are complete; execution stops before M4.
+is claimed. All M3 issues were completed before M4 authorization.
 
 ## M4 shell evidence
 
@@ -64,6 +64,17 @@ ordered timeline, refresh readback and web-local/Postgres diagnostics all pass.
 Five component tests prove polling stop/cleanup/stale-read protection and safe native
 diagnostics injection. Aggregate validation passes (18 frontend/29 Rust tests).
 Desktop transport tests remain passing; a new packaged native walkthrough is not claimed.
+
+## M4 browser automation evidence
+
+M4-04 is complete. Final `npm run validate:local` passes: 25 frontend tests,
+29 Rust unit tests, three explicit Postgres tests, seven browser workflows,
+and all quality/build gates. A repeat-each=2 browser run passes all 14 checks
+with zero retries. Desktop/narrow screenshots were inspected; no document
+overflow is observed. Native diagnostics/client routing are tested through
+injection; native protocol tests pass, but the new M4 native UI/SQLite/package
+walkthrough remains M5. Browser test records are retained in project storage.
+All four M4 issues are complete; stop before M5 pending user confirmation.
 
 ## Explicitly not proven
 

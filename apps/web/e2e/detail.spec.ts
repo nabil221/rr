@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 for (const rejected of [false, true]) {
   test(`execute and reload ${rejected ? "rejected" : "completed"} detail`, async ({
     page,
-  }) => {
+  }, testInfo) => {
     await page.goto("/#/new");
     if (rejected)
       await page.getByLabel("Force a controlled validation rejection").check();
@@ -38,6 +38,20 @@ for (const rejected of [false, true]) {
     await expect(
       page.getByRole("heading", { name: "Lifecycle events (3)", exact: true }),
     ).toBeVisible();
+    if (!rejected) {
+      for (const width of [1120, 360]) {
+        await page.setViewportSize({ width, height: 820 });
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= window.innerWidth,
+          ),
+        ).toBe(true);
+        await page.screenshot({
+          path: testInfo.outputPath(`completed-${width}.png`),
+          fullPage: true,
+        });
+      }
+    }
   });
 }
 test("diagnostics identifies the local web host and Postgres safely", async ({
