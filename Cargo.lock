@@ -1969,10 +1969,13 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "local-stack-proof-application",
+ "local-stack-proof-domain",
+ "local-stack-proof-persistence-sqlite",
  "local-stack-proof-transport-http",
  "serde_json",
  "tauri",
  "tauri-build",
+ "tempfile",
  "tokio",
  "tower",
 ]

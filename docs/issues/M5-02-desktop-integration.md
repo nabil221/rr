@@ -31,4 +31,6 @@ Implement selected transport client, Tauri host configuration, production React 
 
 ## Evidence
 
-_Pending execution._
+- Implementation is wired to per-user SQLite with an absolute local test-directory override; no React host-specific business branch or backend listener was added. Native health labels SQLite.
+- `cargo test -p local-stack-proof-desktop`: six tests pass, including local path selection/reconnect and native SQLite create/execute/rejection/detail/history after host recomposition. Strict desktop Clippy passes.
+- Actual development/production UI walkthrough is pending. The user requested notification when UI testing is needed while currently using CLI; UI automation is held until they signal readiness. This issue remains in progress, not complete.

@@ -45,9 +45,9 @@ The repeatable component/database/browser checks are in [docs/local-testing.md](
 Health reports the selected storage; it is a liveness response, not a database readiness probe.
 A process interruption after STARTED can leave a run running: durable jobs/recovery are outside this proof.
 
-## Try the desktop proof (M2)
+## Try the desktop proof (M5)
 
-Windows desktop builds also require the Microsoft C++ build tools, Windows SDK, and WebView2 runtime. No API server, Docker, or database is required.
+Windows desktop builds also require the Microsoft C++ build tools, Windows SDK, and WebView2 runtime. No API server, Docker, or separate database service is required; SQLite is bundled.
 
 From the repository root:
 
@@ -58,7 +58,9 @@ npm run dev:desktop
 This starts the desktop-only Vite server on port 5174 and opens Tauri. The shared
 routed React UI uses an in-process custom protocol to reach the same Axum router
 and Rust application service, without opening a backend server socket. Desktop and
-web runs are separate; desktop history disappears when the desktop process exits.
+web runs are separate; desktop history is saved to its per-user SQLite database
+and survives process restart. See [desktop testing](docs/desktop-testing.md) for
+the local data location and an isolated test-directory override.
 
 For a production executable with embedded frontend assets:
 
@@ -68,6 +70,7 @@ npm run build:desktop
 
 Then launch `target/release/local-stack-proof-desktop.exe`. Rebuild after frontend
 changes to embed the current UI. This executable does not require Vite or the web API.
-Installer/signing work is deferred to M5. The M2 transport/native baseline walkthrough
-is verified in [M2-04](docs/issues/M2-04-in-memory-desktop-vertical-slice.md);
-a new packaged M4 UI walkthrough is not claimed by browser/component tests.
+The M2 transport/native baseline is verified in
+[M2-04](docs/issues/M2-04-in-memory-desktop-vertical-slice.md). M5 verifies the current
+shared UI with SQLite and an actual Windows package; browser/component tests alone
+do not substitute for that native evidence. Public distribution/signing is excluded.

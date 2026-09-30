@@ -52,9 +52,9 @@ export function DiagnosticsScreen({ client }: { client: RunClient }) {
         independent; web and desktop do not synchronize.
       </p>
       <p>
-        Desktop storage remains temporary until the SQLite milestone. No
-        connection strings, credentials, filesystem paths, or stack traces are
-        displayed.
+        Desktop persists locally in SQLite; web persists in its local Postgres
+        store. No connection strings, credentials, filesystem paths, or stack
+        traces are displayed.
       </p>
     </section>
   );
