@@ -57,6 +57,14 @@ persists a queued run, and history readback survives refresh with detail navigat
 The targeted local E2E test and full aggregate validation passed. Execution and
 safe host diagnostics remain M4-03; no client-side computation or alternate store.
 
+## M4 detail/diagnostics evidence
+
+M4-03 is complete: live browser completed/rejected execution, saved configuration,
+ordered timeline, refresh readback and web-local/Postgres diagnostics all pass.
+Five component tests prove polling stop/cleanup/stale-read protection and safe native
+diagnostics injection. Aggregate validation passes (18 frontend/29 Rust tests).
+Desktop transport tests remain passing; a new packaged native walkthrough is not claimed.
+
 ## Explicitly not proven
 
 - Deployment, remote/networked access, accounts, synchronization, mobile support, real file ingestion, real Excel/workflow functionality, job durability beyond this local process model, and generic workflow authoring.

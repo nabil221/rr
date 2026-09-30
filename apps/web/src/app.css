@@ -207,6 +207,27 @@ h1 {
 .screen-action {
   margin: 18px 0 0;
 }
+
+.detail-status {
+  margin: 18px 0;
+}
+.metadata {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 10px 16px;
+  margin: 18px 0 24px;
+}
+.metadata dt {
+  color: #647370;
+}
+.metadata dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.execute-button {
+  max-width: 360px;
+  margin: 0 0 24px;
+}
 [aria-invalid="true"] {
   border-color: #a5502b !important;
 }
