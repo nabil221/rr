@@ -5,6 +5,61 @@
   font-size: 15px;
 }
 
+.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.main-nav a,
+.secondary-button {
+  padding: 10px 15px;
+  border: 1px solid #cbdcd2;
+  border-radius: 9px;
+  background: #fff;
+  color: #246f62;
+  text-decoration: none;
+  cursor: pointer;
+}
+.main-nav a[aria-current="page"] {
+  background: #246f62;
+  color: white;
+}
+a:focus-visible {
+  outline: 3px solid #278273;
+  outline-offset: 3px;
+}
+.screen {
+  padding: 24px;
+  min-width: 0;
+}
+.screen h2 {
+  letter-spacing: -0.03em;
+}
+code,
+.run-id,
+.error-box {
+  overflow-wrap: anywhere;
+}
+.run-row {
+  text-decoration: none;
+}
+.screen .run-form {
+  padding: 0;
+  max-width: 560px;
+}
+.error-box {
+  margin-bottom: 18px;
+}
+@media (width <= 430px) {
+  .screen {
+    padding: 18px;
+  }
+  .result-summary {
+    flex-wrap: wrap;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

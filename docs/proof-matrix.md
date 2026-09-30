@@ -42,6 +42,14 @@ contract checking before TypeScript and passes with 29 Rust tests and 5 client t
 The three live database tests also pass. No runtime JSON validator or OpenAPI SDK
 is claimed. All M3 issues are complete; execution stops before M4.
 
+## M4 shell evidence
+
+M4-01 and DET-002 are complete: injectable generated-type client, local-only
+endpoint selection, four hash routes and shared responsive shell. Aggregate validation
+passes (13 frontend tests, 29 Rust tests); the local headless browser smoke verifies
+all routes, navigation, refresh, and no overflow at 1120px/360px. No new native
+walkthrough is claimed. Create/list/detail workflows remain the next M4 issues.
+
 ## Explicitly not proven
 
 - Deployment, remote/networked access, accounts, synchronization, mobile support, real file ingestion, real Excel/workflow functionality, job durability beyond this local process model, and generic workflow authoring.

@@ -23,6 +23,7 @@
     "lint": "npm run lint -w @local-stack-proof/web && cargo clippy --workspace --all-targets -- -D warnings",
     "test": "npm run test -w @local-stack-proof/web && cargo test --workspace",
     "test:postgres": "cargo test -p local-stack-proof-persistence-postgres -- --ignored",
+    "test:e2e": "npm run test:e2e -w @local-stack-proof/web",
     "contract:generate": "cargo run -p local-stack-proof-transport-http --bin api-contract -- --write",
     "contract:check": "cargo run -p local-stack-proof-transport-http --bin api-contract -- --check",
     "typecheck": "npm run typecheck -w @local-stack-proof/web",

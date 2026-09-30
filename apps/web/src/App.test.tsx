@@ -1,6 +1,17 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { convertFileSrc, isTauri } from "@tauri-apps/api/core";
-import { ApiError, createRun, executeRun, listRuns } from "./api";
+import {
+  ApiError,
+  createClient,
+  createRun,
+  executeRun,
+  listRuns,
+  localApiRoot,
+  type RunClient,
+} from "./api";
+import { renderToStaticMarkup } from "react-dom/server";
+import { App } from "./App";
+import { parseRoute, type Route } from "./routes";
 
 vi.mock("@tauri-apps/api/core", () => ({
   isTauri: vi.fn(() => false),
@@ -12,6 +23,48 @@ describe("local API client", () => {
     vi.unstubAllGlobals();
     vi.clearAllMocks();
     vi.mocked(isTauri).mockReturnValue(false);
+  });
+
+  it("allows only local credential-free API roots", () => {
+    expect(localApiRoot("http://127.0.0.1:3000/")).toBe(
+      "http://127.0.0.1:3000",
+    );
+    for (const value of [
+      "https://example.com",
+      "http://user:password@127.0.0.1:3000",
+      "http://127.0.0.1:3000/api",
+      "http://127.0.0.1:3000/?secret=x",
+    ])
+      expect(() => localApiRoot(value)).toThrow();
+  });
+
+  it("loads detail and safe diagnostics through the selected client", async () => {
+    const fetchMock = vi.fn().mockImplementation(() =>
+      Response.json({
+        status: "ok",
+        storage: "postgres",
+        secret: "not-displayed",
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const client = createClient("http://127.0.0.1:3000");
+    await client.getRun("id with spaces");
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      "http://127.0.0.1:3000/api/runs/id%20with%20spaces",
+    );
+    await expect(client.diagnostics()).resolves.toEqual({
+      host: "web-local",
+      transport: "loopback-http",
+      storage: "postgres",
+      status: "ok",
+    });
+    vi.mocked(isTauri).mockReturnValue(true);
+    await expect(
+      createClient("https://ignored.example.com").diagnostics(),
+    ).resolves.toMatchObject({
+      host: "desktop-local",
+      transport: "embedded-protocol",
+    });
   });
 
   it("creates runs with JSON through the same-origin API path", async () => {
@@ -108,5 +161,36 @@ describe("local API client", () => {
       message: "Region is required",
     });
     expect(fetchMock.mock.calls[0][1]).toEqual({ signal: controller.signal });
+  });
+});
+
+describe("host-neutral shell", () => {
+  const client: RunClient = {
+    listRuns: vi.fn(),
+    getRun: vi.fn(),
+    createRun: vi.fn(),
+    executeRun: vi.fn(),
+    diagnostics: vi.fn(),
+  };
+  it.each<[Route, string]>([
+    [{ kind: "runs" }, "Runs"],
+    [{ kind: "new" }, "New Run"],
+    [{ kind: "detail", id: "run-1" }, "Run detail"],
+    [{ kind: "diagnostics" }, "Diagnostics"],
+    [{ kind: "missing" }, "Page not found"],
+  ])("renders route %j", (route, title) => {
+    const html = renderToStaticMarkup(
+      <App client={client} initialRoute={route} />,
+    );
+    expect(html).toContain(title);
+    expect(html).toContain('aria-label="Main navigation"');
+  });
+  it("parses safe hash deep links and handles invalid encodings", () => {
+    expect(parseRoute("#/runs/id%20with%20spaces")).toEqual({
+      kind: "detail",
+      id: "id with spaces",
+    });
+    expect(parseRoute("#/runs/%broken")).toEqual({ kind: "missing" });
+    expect(parseRoute("#/unknown")).toEqual({ kind: "missing" });
   });
 });

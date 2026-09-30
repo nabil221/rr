@@ -23,7 +23,7 @@ Both modes create, execute, inspect, and persist a deterministic demo run. The s
 
 M3 is complete: local Postgres persistence, hardened web API, and generated Rust/TypeScript
 contract are verified. M2's native desktop UI walkthrough remains proven; desktop
-storage is still in-memory until M5. Execution is stopped before M4 pending confirmation.
+storage is still in-memory until M5. The user authorized M4; stop before M5 pending confirmation.
 
 | Order | Issue                                                                                      | Depends on                     |
 | ----: | ------------------------------------------------------------------------------------------ | ------------------------------ |
@@ -57,6 +57,6 @@ storage is still in-memory until M5. Execution is stopped before M4 pending conf
 - Work in order; skip M2-03 unless M2-02 fails its criteria.
 - PWA is optional and cannot delay browser or desktop proof.
 - A completed issue must have passing evidence in its own document and in the proof matrix.
-- Stop at the authorized milestone boundary and obtain confirmation before starting the next milestone. Current authorization covers M3 only; M4 is not authorized.
+- Stop at the authorized milestone boundary and obtain confirmation before starting the next milestone. Current authorization covers M4 only; M5 is not authorized.
 - Pause only for a hard-boundary change: remote services, synchronization, accounts, a technology-family replacement, paid infrastructure, real-file processing, or retaining a failed transport approach.
 - A bounded detour must be recorded in the [detour register](detours/README.md) before implementation begins. A detour never advances the ordered issue backlog or overrides an explicit milestone/issue stop.
