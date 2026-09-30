@@ -76,6 +76,15 @@ injection; native protocol tests pass, but the new M4 native UI/SQLite/package
 walkthrough remains M5. Browser test records are retained in project storage.
 All four M4 issues are complete; stop before M5 pending user confirmation.
 
+## M5 adapter evidence
+
+M5-01 is complete: bundled SQLite behind the shared repository ports passes five
+isolated file-backed tests, including reconnect, persistent IDs, competing writes,
+immutable events, rollback, and corrupt/unsupported state. Shared serialization
+passes all lifecycle roundtrips; the Postgres/browser regression suite still passes.
+`npm run validate:local`: 25 frontend, 34 Rust, three Postgres, seven browser tests.
+Native composition and installed-package UI proof remain M5-02/03.
+
 ## Explicitly not proven
 
 - Deployment, remote/networked access, accounts, synchronization, mobile support, real file ingestion, real Excel/workflow functionality, job durability beyond this local process model, and generic workflow authoring.

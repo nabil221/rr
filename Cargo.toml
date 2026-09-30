@@ -4,6 +4,8 @@ members = [
   "crates/application",
   "crates/transport-http",
   "crates/persistence-postgres",
+  "crates/persistence-format",
+  "crates/persistence-sqlite",
   "crates/test-support",
   "apps/api",
   "apps/desktop/src-tauri",

@@ -1,6 +1,6 @@
 # M5-02: Desktop Integration
 
-**Status:** planned  
+**Status:** in progress
 **Dependencies:** M5-01, M4-01, whichever desktop transport path (M2-02 or M2-03) is selected
 
 ## Objective
@@ -10,6 +10,13 @@ Run the shared React screens and shared Rust application services as a local Tau
 ## Scope
 
 Implement selected transport client, Tauri host configuration, production React bundle integration, minimal local permissions, and desktop diagnostics. Exclude installer testing.
+
+## Implementation plan
+
+1. Compose the SQLite repository during Tauri setup at the application-local-data directory; fail safely rather than reverting to memory. Provide an explicit absolute test-data-directory override.
+2. Keep the existing custom protocol, limits, exact-origin boundary, and shared client/screens. Label native health storage as SQLite.
+3. Add process-free protocol tests against isolated SQLite, and run the actual native development UI through creation, success/rejection, history, detail refresh, and diagnostics.
+4. Rebuild embedded production assets and verify persistence across host restart. Document local data and interrupted-running behavior without adding recovery jobs or synchronization.
 
 ## Verification
 
