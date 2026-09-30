@@ -50,6 +50,13 @@ passes (13 frontend tests, 29 Rust tests); the local headless browser smoke veri
 all routes, navigation, refresh, and no overflow at 1120px/360px. No new native
 walkthrough is claimed. Create/list/detail workflows remain the next M4 issues.
 
+## M4 create/list evidence
+
+M4-02 is complete: real-browser server validation preserves input, valid creation
+persists a queued run, and history readback survives refresh with detail navigation.
+The targeted local E2E test and full aggregate validation passed. Execution and
+safe host diagnostics remain M4-03; no client-side computation or alternate store.
+
 ## Explicitly not proven
 
 - Deployment, remote/networked access, accounts, synchronization, mobile support, real file ingestion, real Excel/workflow functionality, job durability beyond this local process model, and generic workflow authoring.
