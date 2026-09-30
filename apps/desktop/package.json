@@ -6,6 +6,7 @@
     "dev": "tauri dev",
     "spike:dev": "tauri dev --config src-tauri/tauri.spike.conf.json",
     "build": "tauri build --no-bundle",
+    "package": "tauri build --bundles nsis",
     "spike:build": "tauri build --no-bundle --config src-tauri/tauri.spike.conf.json"
   },
   "devDependencies": {

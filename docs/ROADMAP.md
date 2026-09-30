@@ -23,9 +23,9 @@ Both modes create, execute, inspect, and persist a deterministic demo run. The s
 
 M4 is complete: routed shared UI, queued creation and persistent history, observable
 execution/detail, safe diagnostics, and repeatable local browser/component tests.
-M3's Postgres/contract proof and M2's native baseline remain verified. Desktop storage
-is still in-memory until M5. The user authorized M5: SQLite, native integration,
-and Windows package verification. M5-01/02 are complete; M5-03 is in progress. Stop before M6.
+M3's Postgres/contract proof and M2's native baseline remain verified. M5 is complete:
+desktop SQLite, native integration, and actual Windows installation/restart are
+verified. All local regression checks pass. Stop before M6; it is not authorized.
 
 | Order | Issue                                                                                      | Depends on                     |
 | ----: | ------------------------------------------------------------------------------------------ | ------------------------------ |

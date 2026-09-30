@@ -6,6 +6,26 @@ fn configuration(reject: bool) -> RunConfiguration {
 }
 
 #[test]
+fn evidence_inspection_is_read_only_and_never_creates_missing_files() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("runs.sqlite3");
+    assert!(SqliteRunRepository::open_read_only(&path).is_err());
+    assert!(!path.exists());
+    let service = SqliteRunRepository::open(&path).unwrap().service();
+    let run = service.create(configuration(false)).unwrap();
+    drop(service);
+    let reader = SqliteRunRepository::open_read_only(&path).unwrap();
+    assert_eq!(reader.get(run.id()).unwrap(), Some(run.clone()));
+    assert!(reader.next_id().is_err());
+    assert!(
+        reader
+            .insert(&Run::new(RunId::new("new").unwrap(), configuration(false)))
+            .is_err()
+    );
+    assert_eq!(reader.list().unwrap(), vec![run]);
+}
+
+#[test]
 fn service_survives_reconnect_and_migrations_are_idempotent() {
     let directory = tempfile::tempdir().unwrap();
     let path = directory.path().join("runs.sqlite3");

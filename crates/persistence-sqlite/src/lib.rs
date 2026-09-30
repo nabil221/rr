@@ -17,6 +17,24 @@ pub struct SqliteRunRepository {
 }
 
 impl SqliteRunRepository {
+    /// Opens an existing database read-only for local evidence inspection.
+    /// Does not create files, apply migrations, or allocate IDs.
+    ///
+    /// # Errors
+    /// Returns unavailable for missing/inaccessible data or unsupported schema.
+    pub fn open_read_only(path: &Path) -> Result<Self, RepositoryError> {
+        let connection =
+            Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
+                .map_err(unavailable)?;
+        connection
+            .busy_timeout(Duration::from_secs(5))
+            .map_err(unavailable)?;
+        supported_schema(&connection)?;
+        Ok(Self {
+            connection: Mutex::new(connection),
+        })
+    }
+
     /// Opens an explicit database path and applies supported migrations.
     /// The host owns directory selection/creation; tests use temporary directories.
     ///
@@ -37,16 +55,7 @@ impl SqliteRunRepository {
             "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'schema_migrations')", [], |row| row.get(0)
         ).map_err(unavailable)?;
         if initialized {
-            let versions: Vec<i64> = transaction
-                .prepare("SELECT version FROM schema_migrations ORDER BY version")
-                .map_err(unavailable)?
-                .query_map([], |row| row.get(0))
-                .map_err(unavailable)?
-                .collect::<Result<_, _>>()
-                .map_err(unavailable)?;
-            if versions != [1] {
-                return Err(RepositoryError::Unavailable);
-            }
+            supported_schema(&transaction)?;
         } else {
             transaction
                 .execute_batch(include_str!("../migrations/0001_runs.sql"))
@@ -74,6 +83,21 @@ impl SqliteRunRepository {
 
 fn unavailable(_: rusqlite::Error) -> RepositoryError {
     RepositoryError::Unavailable
+}
+
+fn supported_schema(connection: &Connection) -> Result<(), RepositoryError> {
+    let versions: Vec<i64> = connection
+        .prepare("SELECT version FROM schema_migrations ORDER BY version")
+        .map_err(unavailable)?
+        .query_map([], |row| row.get(0))
+        .map_err(unavailable)?
+        .collect::<Result<_, _>>()
+        .map_err(unavailable)?;
+    if versions == [1] {
+        Ok(())
+    } else {
+        Err(RepositoryError::Unavailable)
+    }
 }
 
 fn load(connection: &Connection, id: &str) -> Result<Option<Run>, RepositoryError> {

@@ -74,3 +74,9 @@ The M2 transport/native baseline is verified in
 [M2-04](docs/issues/M2-04-in-memory-desktop-vertical-slice.md). M5 verifies the current
 shared UI with SQLite and an actual Windows package; browser/component tests alone
 do not substitute for that native evidence. Public distribution/signing is excluded.
+
+For the local Windows installer, run `npm run package:desktop`. The current-user,
+unsigned NSIS package appears under `target/release/bundle/nsis/`. It requires
+existing WebView2 and does not download a runtime. The actual isolated installation,
+UI/restart walkthrough, data retention, and repeatable smoke commands are documented
+in [desktop testing](docs/desktop-testing.md).

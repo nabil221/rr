@@ -57,8 +57,58 @@ local path selection, SQLite contract, and host recomposition. Ordinary
 
 ## Current evidence
 
-M5-01/02 are complete: adapter/protocol checks, development success/rejection,
-real host restart, and embedded production readback/diagnostics pass. Production
-ran with project API/Vite/Postgres stopped; no native-owned TCP socket was observed.
-The machine network adapter was not disabled. M5-03 installed-package smoke is in
-progress; no successful installation is claimed yet.
+M5-01/02/03 are complete: adapter/protocol checks, development success/rejection,
+real host restart, and actual installed Windows-package creation/execution/restart
+readback pass. Production and installed builds ran with project API/Vite/Postgres
+stopped; no native-owned TCP socket was observed. Machine networking was not
+disabled. The read-only exact-ID verifier and full local regression suite pass;
+Postgres is restored. Package hash and observations are recorded in
+[M5-03](issues/M5-03-windows-package-smoke-test.md). Stop before M6 authorization.
+
+## Windows package smoke procedure
+
+Build `npm run package:desktop`. The unsigned current-user NSIS installer is under
+`target/release/bundle/nsis/`. Existing WebView2 is an explicit prerequisite:
+`webviewInstallMode=skip` prevents downloading/installing a runtime during this
+local offline proof. A clean machine without WebView2 is **not** supported by this
+package yet. No signing, updater, cloud service, or public distribution is added.
+
+Use the exact generated filename below; select fresh isolated install/data folders:
+
+```powershell
+./scripts/desktop-smoke.ps1 -Step Install -DataDirectory 'D:/projects/nothing-to-see-here/rr/target/desktop-smoke/package-data' -InstallDirectory 'D:/projects/nothing-to-see-here/rr/target/desktop-smoke/package-installed' -PackagePath './target/release/bundle/nsis/Local Stack Proof_0.1.0_x64-setup.exe'
+./scripts/desktop-smoke.ps1 -Step Launch -DataDirectory 'D:/projects/nothing-to-see-here/rr/target/desktop-smoke/package-data' -InstallDirectory 'D:/projects/nothing-to-see-here/rr/target/desktop-smoke/package-installed'
+```
+
+The script is Windows-specific verification tooling; core/UI paths remain
+host-agnostic. Substitute your absolute checkout path. It checks paths, refuses
+an existing install directory, does not delete data, and only accepts this project's
+local package. NSIS installation writes current-user shortcuts/uninstall registration
+as normal. Close the app, then run Launch again against the same data directory.
+
+Stop the project API/Vite and `docker compose -f infra/compose.yaml stop postgres`
+before launch. Do not terminate unrelated processes or reset volumes. In the UI,
+create/execute default seed 42, north, threshold 0 once normally and once with forced
+rejection; verify all routes/diagnostics and note the exact IDs. After restarting,
+retrieve both IDs, then run:
+
+```powershell
+./scripts/desktop-smoke.ps1 -Step Verify -DataDirectory 'D:/projects/nothing-to-see-here/rr/target/desktop-smoke/package-data' -CompletedId 'run-00000000000000000001' -RejectedId 'run-00000000000000000002'
+docker compose -f infra/compose.yaml up -d --wait
+```
+
+Verify checks existing data read-only using the Rust `sqlite-proof` utility. This
+supplements, not replaces, visual UI observations. It never creates a missing DB,
+migrates, or writes runs. Read-only behavior is tested. Inspect listeners for the
+installed executable and project server ports separately; do not disable host-wide
+network/security settings. Machine-wide offline behavior/WebView background traffic
+is not claimed from stopped project servers alone.
+
+Installed builds keep `desktop.log` beside the run DB: startup and safe request
+method/route-template/status/timing only, no request bodies, IDs, credentials,
+filesystem paths, remote logging, or telemetry. Logging stops near 1 MiB without
+truncating or deleting prior logs. SQLite/ordinary app data is outside installation
+files and retained across app close/reinstall; uninstall data-removal choices are
+not exercised by this smoke. Test data and installed files are kept for inspection.
+Frontend capabilities are explicitly empty: no shell, filesystem, dialog, HTTP,
+or updater plugin permission. The Rust host accesses only its selected local store.

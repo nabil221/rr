@@ -1,6 +1,6 @@
 # ADR-003: Local SQLite Persistence
 
-**Status:** accepted and adapter-verified in M5-01
+**Status:** accepted and verified through M5-03
 
 ## Context and options
 
@@ -32,8 +32,10 @@ No automatic reset, sync, import, or retry/recovery of interrupted running jobs.
 ## Verification
 
 Temporary-directory adapter tests, native SQLite protocol tests, native development
-walkthrough, and installed Windows-package restart readback. M5-01 adapter tests and
-full web regression suite pass; host/package evidence remains M5-02/03.
+walkthrough, and installed Windows-package restart readback all pass. The final
+`npm run validate:local` regression suite passes, including live Postgres/browser
+checks. See [M5-03](../issues/M5-03-windows-package-smoke-test.md) for installed
+package evidence and its offline/prerequisite limitations.
 
 ## Consequences and fallback
 
