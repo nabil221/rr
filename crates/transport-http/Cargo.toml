@@ -10,6 +10,7 @@ axum = "0.8.9"
 local-stack-proof-application = { path = "../application" }
 local-stack-proof-domain = { path = "../domain" }
 serde = { version = "1.0.229", features = ["derive"] }
+tokio = { version = "1.53.1", features = ["rt"] }
 
 [dev-dependencies]
 serde_json = "1.0.151"

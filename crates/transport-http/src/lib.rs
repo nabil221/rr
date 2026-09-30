@@ -1,11 +1,13 @@
 //! HTTP adapter: JSON DTOs in, application-service calls, JSON DTOs out.
 
-use axum::extract::{Path, State};
+mod boundary;
+
+use axum::extract::{DefaultBodyLimit, Path, State, rejection::JsonRejection};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use local_stack_proof_application::{RunService, ServiceError};
+use local_stack_proof_application::{RepositoryError, RunService, ServiceError};
 use local_stack_proof_domain::{
     DomainError, EventKind, GroupSummary, Run, RunConfiguration, RunEvent, RunId, RunResult,
     RunStatus, ValidationMessage,
@@ -15,29 +17,67 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone)]
 struct AppState {
     runs: RunService,
+    storage: &'static str,
 }
 
 /// Compose the host-independent demo API around shared application services.
 pub fn router(runs: RunService) -> Router {
+    compose(runs, "in-memory").layer(axum::middleware::from_fn(boundary::request_id))
+}
+
+/// Compose the persistent web host with its exact local-origin boundary.
+pub fn web_router(runs: RunService) -> Router {
+    compose(runs, "postgres")
+        .layer(axum::middleware::from_fn(boundary::web_origin))
+        .layer(axum::middleware::from_fn(boundary::request_id))
+}
+
+fn compose(runs: RunService, storage: &'static str) -> Router {
     Router::new()
         .route("/api/health", get(health))
         .route("/api/runs", post(create_run).get(list_runs))
         .route("/api/runs/{id}", get(get_run))
         .route("/api/runs/{id}/execute", post(execute_run))
-        .with_state(AppState { runs })
+        .fallback(|| async {
+            ApiFailure::new(StatusCode::NOT_FOUND, "not-found", "Route not found")
+        })
+        .method_not_allowed_fallback(|| async {
+            ApiFailure::new(
+                StatusCode::METHOD_NOT_ALLOWED,
+                "method-not-allowed",
+                "Method not allowed",
+            )
+        })
+        .layer(DefaultBodyLimit::max(65_536))
+        .with_state(AppState { runs, storage })
 }
 
-async fn health() -> Json<HealthDto> {
+async fn health(State(state): State<AppState>) -> Json<HealthDto> {
     Json(HealthDto {
         status: "ok",
-        storage: "in-memory",
+        storage: state.storage,
     })
 }
 
 async fn create_run(
     State(state): State<AppState>,
-    Json(request): Json<CreateRunRequest>,
+    request: Result<Json<CreateRunRequest>, JsonRejection>,
 ) -> Result<impl IntoResponse, ApiFailure> {
+    let Json(request) = request.map_err(|error| {
+        if error.status() == StatusCode::PAYLOAD_TOO_LARGE {
+            ApiFailure::new(
+                StatusCode::PAYLOAD_TOO_LARGE,
+                "request-too-large",
+                "Request body exceeds 64 KiB",
+            )
+        } else {
+            ApiFailure::new(
+                StatusCode::BAD_REQUEST,
+                "invalid-json",
+                "Expected a valid run configuration JSON object",
+            )
+        }
+    })?;
     let configuration = RunConfiguration::new(
         request.seed,
         request.region,
@@ -46,18 +86,12 @@ async fn create_run(
     )
     .map_err(|error| ApiFailure::from_domain(&error))?;
 
-    let run = state
-        .runs
-        .create(configuration)
-        .map_err(|error| ApiFailure::from_service(&error))?;
+    let run = blocking(move || state.runs.create(configuration)).await?;
     Ok((StatusCode::CREATED, Json(RunDto::from(run))))
 }
 
 async fn list_runs(State(state): State<AppState>) -> Result<Json<Vec<RunDto>>, ApiFailure> {
-    let runs = state
-        .runs
-        .list()
-        .map_err(|error| ApiFailure::from_service(&error))?;
+    let runs = blocking(move || state.runs.list()).await?;
     Ok(Json(runs.into_iter().map(RunDto::from).collect()))
 }
 
@@ -66,10 +100,7 @@ async fn get_run(
     Path(id): Path<String>,
 ) -> Result<Json<RunDto>, ApiFailure> {
     let id = RunId::new(id).map_err(|error| ApiFailure::from_domain(&error))?;
-    let run = state
-        .runs
-        .get(&id)
-        .map_err(|error| ApiFailure::from_service(&error))?;
+    let run = blocking(move || state.runs.get(&id)).await?;
     Ok(Json(RunDto::from(run)))
 }
 
@@ -78,10 +109,7 @@ async fn execute_run(
     Path(id): Path<String>,
 ) -> Result<Json<RunDto>, ApiFailure> {
     let id = RunId::new(id).map_err(|error| ApiFailure::from_domain(&error))?;
-    let run = state
-        .runs
-        .execute(&id)
-        .map_err(|error| ApiFailure::from_service(&error))?;
+    let run = blocking(move || state.runs.execute(&id)).await?;
     Ok(Json(RunDto::from(run)))
 }
 
@@ -242,6 +270,17 @@ struct ErrorDto {
 struct ApiFailure(StatusCode, ErrorDto);
 
 impl ApiFailure {
+    fn new(status: StatusCode, code: &str, message: &str) -> Self {
+        Self(
+            status,
+            ErrorDto {
+                code: code.to_owned(),
+                message: message.to_owned(),
+                field: None,
+            },
+        )
+    }
+
     fn from_domain(error: &DomainError) -> Self {
         let field = match error {
             DomainError::InvalidRegion => Some("region"),
@@ -259,6 +298,23 @@ impl ApiFailure {
     }
 
     fn from_service(error: &ServiceError) -> Self {
+        if let ServiceError::Repository(repository) = error {
+            return match repository {
+                RepositoryError::Conflict(_) | RepositoryError::AlreadyExists(_) => Self::new(
+                    StatusCode::CONFLICT,
+                    "write-conflict",
+                    "Run changed; reload before retrying",
+                ),
+                RepositoryError::NotFound(_) => {
+                    Self::new(StatusCode::NOT_FOUND, "not-found", "Run not found")
+                }
+                RepositoryError::Unavailable => Self::new(
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "repository-error",
+                    "Run storage is unavailable",
+                ),
+            };
+        }
         let (status, code) = match error {
             ServiceError::NotFound(_) => (StatusCode::NOT_FOUND, "not-found"),
             ServiceError::Domain(DomainError::InvalidTransition { .. }) => {
@@ -276,6 +332,21 @@ impl ApiFailure {
             },
         )
     }
+}
+
+async fn blocking<T: Send + 'static>(
+    operation: impl FnOnce() -> Result<T, ServiceError> + Send + 'static,
+) -> Result<T, ApiFailure> {
+    tokio::task::spawn_blocking(operation)
+        .await
+        .map_err(|_| {
+            ApiFailure::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "internal-error",
+                "Request could not be completed",
+            )
+        })?
+        .map_err(|error| ApiFailure::from_service(&error))
 }
 
 impl IntoResponse for ApiFailure {
@@ -370,5 +441,122 @@ mod tests {
         let (status, error) = call(router, "GET", "/api/runs/missing", Value::Null).await;
         assert_eq!(status, StatusCode::NOT_FOUND);
         assert_eq!(error["code"], "not-found");
+    }
+
+    #[tokio::test]
+    async fn bounds_json_and_returns_safe_route_errors() {
+        let router = router(local_stack_proof_application::in_memory_run_service());
+        for (body, expected, code) in [
+            ("{".to_owned(), StatusCode::BAD_REQUEST, "invalid-json"),
+            (
+                "x".repeat(65_537),
+                StatusCode::PAYLOAD_TOO_LARGE,
+                "request-too-large",
+            ),
+        ] {
+            let response = router
+                .clone()
+                .oneshot(
+                    Request::builder()
+                        .method("POST")
+                        .uri("/api/runs")
+                        .header("content-type", "application/json")
+                        .header("x-request-id", "untrusted-client-id")
+                        .body(Body::from(body))
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+            assert_eq!(response.status(), expected);
+            assert_ne!(response.headers()["x-request-id"], "untrusted-client-id");
+            let value: Value =
+                serde_json::from_slice(&to_bytes(response.into_body(), 65_536).await.unwrap())
+                    .unwrap();
+            assert_eq!(value["code"], code);
+        }
+        for (method, path, expected) in [
+            ("GET", "/missing", StatusCode::NOT_FOUND),
+            ("DELETE", "/api/runs", StatusCode::METHOD_NOT_ALLOWED),
+        ] {
+            let (status, error) = call(router.clone(), method, path, Value::Null).await;
+            assert_eq!(status, expected);
+            assert!(error["message"].is_string());
+        }
+    }
+
+    #[tokio::test]
+    async fn restricts_web_origin_and_preflight_and_correlates_all_responses() {
+        let router = web_router(local_stack_proof_application::in_memory_run_service());
+        for (method, origin, expected) in [
+            ("GET", "http://127.0.0.1:5173", StatusCode::OK),
+            ("OPTIONS", "http://127.0.0.1:5173", StatusCode::NO_CONTENT),
+            ("GET", "https://example.com", StatusCode::FORBIDDEN),
+            ("OPTIONS", "http://localhost:5173", StatusCode::FORBIDDEN),
+        ] {
+            let response = router
+                .clone()
+                .oneshot(
+                    Request::builder()
+                        .method(method)
+                        .uri("/api/health")
+                        .header("origin", origin)
+                        .header("access-control-request-method", "POST")
+                        .header("access-control-request-headers", "Content-Type")
+                        .body(Body::empty())
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+            assert_eq!(response.status(), expected);
+            assert!(response.headers().contains_key("x-request-id"));
+            if expected == StatusCode::FORBIDDEN {
+                assert!(
+                    !response
+                        .headers()
+                        .contains_key("access-control-allow-origin")
+                );
+            } else {
+                assert_eq!(response.headers()["access-control-allow-origin"], origin);
+            }
+        }
+        let (status, health) = call(router, "GET", "/api/health", Value::Null).await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(health["storage"], "postgres");
+    }
+
+    struct UnavailableRepository;
+
+    impl local_stack_proof_application::RunRepository for UnavailableRepository {
+        fn insert(&self, _: &Run) -> Result<(), RepositoryError> {
+            Err(RepositoryError::Unavailable)
+        }
+        fn save(&self, _: &Run) -> Result<(), RepositoryError> {
+            Err(RepositoryError::Unavailable)
+        }
+        fn get(&self, _: &RunId) -> Result<Option<Run>, RepositoryError> {
+            Err(RepositoryError::Unavailable)
+        }
+        fn list(&self) -> Result<Vec<Run>, RepositoryError> {
+            Err(RepositoryError::Unavailable)
+        }
+    }
+
+    #[tokio::test]
+    async fn storage_failure_and_conflict_have_safe_envelopes() {
+        let service = RunService::new(
+            std::sync::Arc::new(UnavailableRepository),
+            std::sync::Arc::new(local_stack_proof_application::SequentialRunIdGenerator::new()),
+        );
+        let (status, error) = call(router(service), "GET", "/api/runs", Value::Null).await;
+        assert_eq!(status, StatusCode::INTERNAL_SERVER_ERROR);
+        assert_eq!(
+            error,
+            json!({"code":"repository-error", "message":"Run storage is unavailable", "field":null})
+        );
+        let failure = ApiFailure::from_service(&ServiceError::Repository(
+            RepositoryError::Conflict("private-id".to_owned()),
+        ));
+        assert_eq!(failure.0, StatusCode::CONFLICT);
+        assert!(!failure.1.message.contains("private-id"));
     }
 }

@@ -24,6 +24,15 @@ immutable event history, competing-write rejection, and atomic rollback.
 No generated test schemas remained after execution. Browser/HTTP integration and
 server-restart persistence remain pending M3-02; desktop SQLite remains pending M5.
 
+## M3 web-host evidence
+
+M3-02 is complete: real loopback HTTP requests create/execute/read completed and
+rejected runs through Postgres. Both results and timelines survive an API process
+restart. Five shared-router tests cover safe failures, origin restrictions, request
+IDs, limits, and lifecycle semantics; native in-memory protocol tests still pass.
+`npm run validate` passes (27 Rust tests and 5 client tests). This is HTTP host proof,
+not a new browser/native UI walkthrough; that remains the M4 UI verification scope.
+
 ## Explicitly not proven
 
 - Deployment, remote/networked access, accounts, synchronization, mobile support, real file ingestion, real Excel/workflow functionality, job durability beyond this local process model, and generic workflow authoring.
