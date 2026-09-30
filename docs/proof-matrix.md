@@ -85,6 +85,14 @@ passes all lifecycle roundtrips; the Postgres/browser regression suite still pas
 `npm run validate:local`: 25 frontend, 34 Rust, three Postgres, seven browser tests.
 Native composition and installed-package UI proof remain M5-02/03.
 
+## M5 native integration evidence
+
+M5-02 is complete: actual development UI creates/executes completed and rejected
+runs, renders saved results/events and native SQLite diagnostics, and retrieves the
+exact IDs after process restart. Production embedded assets start and read the same
+SQLite file with API/Vite/Postgres stopped. No desktop-owned TCP socket is observed.
+Machine-wide networking was not disabled. Actual Windows installation remains M5-03.
+
 ## Explicitly not proven
 
 - Deployment, remote/networked access, accounts, synchronization, mobile support, real file ingestion, real Excel/workflow functionality, job durability beyond this local process model, and generic workflow authoring.

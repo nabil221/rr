@@ -1,6 +1,6 @@
 # M5-02: Desktop Integration
 
-**Status:** in progress
+**Status:** complete
 **Dependencies:** M5-01, M4-01, whichever desktop transport path (M2-02 or M2-03) is selected
 
 ## Objective
@@ -33,4 +33,8 @@ Implement selected transport client, Tauri host configuration, production React 
 
 - Implementation is wired to per-user SQLite with an absolute local test-directory override; no React host-specific business branch or backend listener was added. Native health labels SQLite.
 - `cargo test -p local-stack-proof-desktop`: six tests pass, including local path selection/reconnect and native SQLite create/execute/rejection/detail/history after host recomposition. Strict desktop Clippy passes.
-- Actual development/production UI walkthrough is pending. The user requested notification when UI testing is needed while currently using CLI; UI automation is held until they signal readiness. This issue remains in progress, not complete.
+- The user signaled native-test readiness. Actual development UI walkthrough passes with isolated `target/desktop-smoke/m5-dev-20260930/runs.sqlite3`: empty history, queued creation, rejected run-00000000000000000001, completed run-00000000000000000002, saved configuration, three-event timelines, result 24/7/64.14, detail reload, history, and desktop-local/embedded-protocol/sqlite/ok diagnostics.
+- After a real development-host close/relaunch, both exact IDs remain and the completed result is retrieved through the UI. Computer-use accessibility click coordinates were unreliable on this window; screenshot-backed coordinates were used and visually verified instead. No application workaround was introduced.
+- `npm run build:desktop` passes. The freshly rebuilt production executable starts with embedded assets and reads both exact development-created IDs; the completed result/configuration/three-event timeline and SQLite diagnostics are visually verified.
+- Production test ran with ports 3000/3001/5173/5174/54329 closed and project Postgres exited. The desktop process owns no TCP connection/listener at the inspected checkpoint. The machine's network adapter was not disabled; this proves no project-server/runtime dependency, not a claim about all possible WebView2 background traffic.
+- Existing aggregate regression evidence is M5-01; desktop's six tests, strict Clippy, frontend 25 tests, typecheck/lint/format checks pass after wiring. Windows installation remains M5-03.

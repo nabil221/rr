@@ -57,5 +57,8 @@ local path selection, SQLite contract, and host recomposition. Ordinary
 
 ## Current evidence
 
-M5-01 adapter checks pass. M5-02 native walkthrough and M5-03 installed-package
-smoke are in progress; no successful installation is claimed yet.
+M5-01/02 are complete: adapter/protocol checks, development success/rejection,
+real host restart, and embedded production readback/diagnostics pass. Production
+ran with project API/Vite/Postgres stopped; no native-owned TCP socket was observed.
+The machine network adapter was not disabled. M5-03 installed-package smoke is in
+progress; no successful installation is claimed yet.

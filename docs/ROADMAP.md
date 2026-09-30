@@ -25,7 +25,7 @@ M4 is complete: routed shared UI, queued creation and persistent history, observ
 execution/detail, safe diagnostics, and repeatable local browser/component tests.
 M3's Postgres/contract proof and M2's native baseline remain verified. Desktop storage
 is still in-memory until M5. The user authorized M5: SQLite, native integration,
-and Windows package verification. M5-01 is complete; M5-02 is in progress. Stop before M6.
+and Windows package verification. M5-01/02 are complete; M5-03 is in progress. Stop before M6.
 
 | Order | Issue                                                                                      | Depends on                     |
 | ----: | ------------------------------------------------------------------------------------------ | ------------------------------ |

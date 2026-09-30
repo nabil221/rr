@@ -1,6 +1,6 @@
 # M5-03: Windows Package Smoke Test
 
-**Status:** planned  
+**Status:** in progress
 **Dependencies:** M5-02
 
 ## Objective

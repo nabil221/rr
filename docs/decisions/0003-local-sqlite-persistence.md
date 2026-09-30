@@ -2,8 +2,6 @@
 
 **Status:** accepted and adapter-verified in M5-01
 
-## Decision
-
 ## Context and options
 
 The desktop already reaches the shared Rust application through an embedded router.
@@ -11,7 +9,7 @@ It needs an independent file-backed store, not another process. Bundled SQLite w
 the existing synchronous ports avoids a host-wide async-port rewrite or a system
 SQLite prerequisite. Postgres remains exclusive to the browser API.
 
-## Storage design
+## Decision
 
 Use bundled rusqlite behind the same synchronous repository/ID ports as Postgres.
 SQLite is compiled into the desktop binary: no separate database service or runtime
