@@ -15,6 +15,15 @@ Update this document as issues are completed. A claim is not proven until it has
 | Windows packaged-build smoke path   | n/a                         | n/a                 | n/a              | pending            |                                                       | pending      |
 | PWA installability, optional        | n/a                         | n/a                 | pending          | n/a                |                                                       | not selected |
 
+## M3 adapter evidence
+
+M3-01 is complete: three explicit live Postgres integration tests pass for
+application-service create/execute/list/detail, reconnect readback, persistent IDs,
+immutable event history, competing-write rejection, and atomic rollback.
+`npm run validate` passes; ordinary tests skip the three explicit database tests.
+No generated test schemas remained after execution. Browser/HTTP integration and
+server-restart persistence remain pending M3-02; desktop SQLite remains pending M5.
+
 ## Explicitly not proven
 
 - Deployment, remote/networked access, accounts, synchronization, mobile support, real file ingestion, real Excel/workflow functionality, job durability beyond this local process model, and generic workflow authoring.

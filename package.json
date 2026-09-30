@@ -22,6 +22,7 @@
     "format:check": "prettier --check . && cargo fmt --all -- --check",
     "lint": "npm run lint -w @local-stack-proof/web && cargo clippy --workspace --all-targets -- -D warnings",
     "test": "npm run test -w @local-stack-proof/web && cargo test --workspace",
+    "test:postgres": "cargo test -p local-stack-proof-persistence-postgres -- --ignored",
     "typecheck": "npm run typecheck -w @local-stack-proof/web",
     "validate": "npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build"
   },
