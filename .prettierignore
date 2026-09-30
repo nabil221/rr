@@ -3,3 +3,4 @@ dist/
 target/
 apps/desktop/src-tauri/gen/
 pnpm-lock.yaml
+apps/web/src/generated/api-contract.ts

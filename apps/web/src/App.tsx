@@ -108,6 +108,7 @@ export function App() {
             <input
               type="number"
               min="0"
+              max="9007199254740991"
               step="1"
               value={seed}
               onChange={(event) => setSeed(event.target.value)}

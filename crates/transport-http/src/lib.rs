@@ -1,6 +1,9 @@
 //! HTTP adapter: JSON DTOs in, application-service calls, JSON DTOs out.
 
 mod boundary;
+mod contract;
+
+pub use contract::typescript_contract;
 
 use axum::extract::{DefaultBodyLimit, Path, State, rejection::JsonRejection};
 use axum::http::StatusCode;
@@ -13,6 +16,7 @@ use local_stack_proof_domain::{
     RunStatus, ValidationMessage,
 };
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 #[derive(Clone)]
 struct AppState {
@@ -78,6 +82,15 @@ async fn create_run(
             )
         }
     })?;
+    if request.seed > 9_007_199_254_740_991 {
+        let mut failure = ApiFailure::new(
+            StatusCode::BAD_REQUEST,
+            "invalid-request",
+            "Seed must be a JavaScript-safe unsigned integer",
+        );
+        failure.1.field = Some("seed".to_owned());
+        return Err(failure);
+    }
     let configuration = RunConfiguration::new(
         request.seed,
         request.region,
@@ -113,28 +126,29 @@ async fn execute_run(
     Ok(Json(RunDto::from(run)))
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 struct CreateRunRequest {
+    #[ts(type = "number")]
     seed: u64,
     region: String,
     threshold: f64,
     force_validation_failure: bool,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 struct HealthDto {
     status: &'static str,
     storage: &'static str,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 struct RunDto {
     id: String,
     configuration: ConfigurationDto,
-    status: &'static str,
+    status: StatusDto,
     result: Option<ResultDto>,
     validation_messages: Vec<ValidationMessageDto>,
     events: Vec<EventDto>,
@@ -157,9 +171,10 @@ impl From<Run> for RunDto {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 struct ConfigurationDto {
+    #[ts(type = "number")]
     seed: u64,
     region: String,
     threshold: f64,
@@ -177,7 +192,7 @@ impl From<&RunConfiguration> for ConfigurationDto {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 struct ResultDto {
     total_records: u32,
@@ -199,7 +214,7 @@ impl From<&RunResult> for ResultDto {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 struct GroupDto {
     category: String,
@@ -219,7 +234,7 @@ impl From<&GroupSummary> for GroupDto {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 struct ValidationMessageDto {
     code: String,
@@ -237,10 +252,10 @@ impl From<&ValidationMessage> for ValidationMessageDto {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 struct EventDto {
-    kind: &'static str,
+    kind: EventKindDto,
     message: String,
 }
 
@@ -248,18 +263,18 @@ impl From<&RunEvent> for EventDto {
     fn from(event: &RunEvent) -> Self {
         Self {
             kind: match event.kind {
-                EventKind::Created => "created",
-                EventKind::Started => "started",
-                EventKind::Completed => "completed",
-                EventKind::Rejected => "rejected",
-                EventKind::Failed => "failed",
+                EventKind::Created => EventKindDto::Created,
+                EventKind::Started => EventKindDto::Started,
+                EventKind::Completed => EventKindDto::Completed,
+                EventKind::Rejected => EventKindDto::Rejected,
+                EventKind::Failed => EventKindDto::Failed,
             },
             message: event.message.clone(),
         }
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 struct ErrorDto {
     code: String,
@@ -355,13 +370,33 @@ impl IntoResponse for ApiFailure {
     }
 }
 
-fn status_name(status: RunStatus) -> &'static str {
+#[derive(Debug, Serialize, TS)]
+#[serde(rename_all = "lowercase")]
+enum StatusDto {
+    Queued,
+    Running,
+    Completed,
+    Rejected,
+    Failed,
+}
+
+#[derive(Debug, Serialize, TS)]
+#[serde(rename_all = "lowercase")]
+enum EventKindDto {
+    Created,
+    Started,
+    Completed,
+    Rejected,
+    Failed,
+}
+
+fn status_name(status: RunStatus) -> StatusDto {
     match status {
-        RunStatus::Queued => "queued",
-        RunStatus::Running => "running",
-        RunStatus::Completed => "completed",
-        RunStatus::Rejected => "rejected",
-        RunStatus::Failed => "failed",
+        RunStatus::Queued => StatusDto::Queued,
+        RunStatus::Running => StatusDto::Running,
+        RunStatus::Completed => StatusDto::Completed,
+        RunStatus::Rejected => StatusDto::Rejected,
+        RunStatus::Failed => StatusDto::Failed,
     }
 }
 
@@ -558,5 +593,18 @@ mod tests {
         ));
         assert_eq!(failure.0, StatusCode::CONFLICT);
         assert!(!failure.1.message.contains("private-id"));
+    }
+
+    #[tokio::test]
+    async fn rejects_unsafe_javascript_seed_but_accepts_boundary() {
+        let router = router(local_stack_proof_application::in_memory_run_service());
+        let mut input = configuration(false);
+        input["seed"] = json!(9_007_199_254_740_992_u64);
+        let (status, error) = call(router.clone(), "POST", "/api/runs", input.clone()).await;
+        assert_eq!(status, StatusCode::BAD_REQUEST);
+        assert_eq!(error["field"], "seed");
+        input["seed"] = json!(9_007_199_254_740_991_u64);
+        let (status, _) = call(router, "POST", "/api/runs", input).await;
+        assert_eq!(status, StatusCode::CREATED);
     }
 }

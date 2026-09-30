@@ -36,6 +36,7 @@ npm run dev:web
 Then open <http://127.0.0.1:5173>. Create a demo run to see the UI send a request through Vite's same-origin `/api` proxy to the local Axum API, execute deterministic Rust domain logic, and render the result and lifecycle events. The app also has a deliberate validation-rejection case. Web history survives browser refresh and API restart. Stop the API with Ctrl+C for graceful shutdown.
 
 Container lifecycle and isolated adapter tests are documented in [infra/README.md](infra/README.md).
+The generated Rust/TypeScript contract and HTTP examples are in [docs/api-contract.md](docs/api-contract.md).
 Health reports the selected storage; it is a liveness response, not a database readiness probe.
 A process interruption after STARTED can leave a run running: durable jobs/recovery are outside this proof.
 

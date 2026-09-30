@@ -21,7 +21,9 @@ Both modes create, execute, inspect, and persist a deterministic demo run. The s
 
 ## Ordered backlog
 
-M2 is complete, including the native desktop UI walkthrough. The user authorized M3; execution stops before M4 pending confirmation.
+M3 is complete: local Postgres persistence, hardened web API, and generated Rust/TypeScript
+contract are verified. M2's native desktop UI walkthrough remains proven; desktop
+storage is still in-memory until M5. Execution is stopped before M4 pending confirmation.
 
 | Order | Issue                                                                                      | Depends on                     |
 | ----: | ------------------------------------------------------------------------------------------ | ------------------------------ |
