@@ -4,7 +4,7 @@
 
 The agent works the next unblocked issue in `docs/ROADMAP.md`, implements the smallest complete slice, runs the specified checks, then records evidence before moving forward. Normal implementation decisions are delegated to the agent.
 
-The user's active execution boundary takes precedence: complete only the authorized milestone, then stop and request confirmation before starting the next milestone. M3 is complete; M4 is not authorized. A blocked acceptance check does not authorize skipping ahead.
+The user's active execution boundary takes precedence: complete only the authorized milestone, then stop and request confirmation before starting the next milestone. M4 is complete; M5 is not authorized. A blocked acceptance check does not authorize skipping ahead.
 
 ## Per-issue procedure
 

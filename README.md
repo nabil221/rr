@@ -11,7 +11,7 @@ Start with the [execution roadmap](docs/ROADMAP.md).
 
 The project uses standard npm workspaces. A version manager such as Volta, nvm, or the official Node installer is optional.
 
-## Try the current web proof (M3)
+## Try the current web proof (M4)
 
 The browser-to-Rust path was first proven in memory in M1. The current web host
 stores runs in the project-owned local Postgres container. Start Docker and run:
@@ -33,10 +33,15 @@ npm run dev:api
 npm run dev:web
 ```
 
-Then open <http://127.0.0.1:5173>. Create a demo run to see the UI send a request through Vite's same-origin `/api` proxy to the local Axum API, execute deterministic Rust domain logic, and render the result and lifecycle events. The app also has a deliberate validation-rejection case. Web history survives browser refresh and API restart. Stop the API with Ctrl+C for graceful shutdown.
+Then open <http://127.0.0.1:5173>. Use **New Run** to create a queued run, then
+**Execute run** on its detail page. **Runs** reads persisted history; **Diagnostics**
+identifies the active host/storage. Detail shows configuration, results or controlled
+rejection, and lifecycle events; non-terminal runs refresh automatically.
+Web history survives browser refresh and API restart. Stop the API with Ctrl+C for graceful shutdown.
 
 Container lifecycle and isolated adapter tests are documented in [infra/README.md](infra/README.md).
 The generated Rust/TypeScript contract and HTTP examples are in [docs/api-contract.md](docs/api-contract.md).
+The repeatable component/database/browser checks are in [docs/local-testing.md](docs/local-testing.md).
 Health reports the selected storage; it is a liveness response, not a database readiness probe.
 A process interruption after STARTED can leave a run running: durable jobs/recovery are outside this proof.
 
@@ -50,7 +55,10 @@ From the repository root:
 npm run dev:desktop
 ```
 
-This starts the desktop-only Vite server on port 5174 and opens Tauri. The same React form uses an in-process custom protocol to reach the same Axum router and Rust application service, without opening a backend server socket. Desktop and web runs are separate; desktop history disappears when the desktop process exits.
+This starts the desktop-only Vite server on port 5174 and opens Tauri. The shared
+routed React UI uses an in-process custom protocol to reach the same Axum router
+and Rust application service, without opening a backend server socket. Desktop and
+web runs are separate; desktop history disappears when the desktop process exits.
 
 For a production executable with embedded frontend assets:
 
@@ -58,4 +66,8 @@ For a production executable with embedded frontend assets:
 npm run build:desktop
 ```
 
-Then launch `target/release/local-stack-proof-desktop.exe`. This executable does not require Vite or the web API. Installer/signing work is deferred to M5. The transport spike and native React success/rejection/history/restart walkthrough are verified; evidence is recorded in [M2-04](docs/issues/M2-04-in-memory-desktop-vertical-slice.md).
+Then launch `target/release/local-stack-proof-desktop.exe`. Rebuild after frontend
+changes to embed the current UI. This executable does not require Vite or the web API.
+Installer/signing work is deferred to M5. The M2 transport/native baseline walkthrough
+is verified in [M2-04](docs/issues/M2-04-in-memory-desktop-vertical-slice.md);
+a new packaged M4 UI walkthrough is not claimed by browser/component tests.

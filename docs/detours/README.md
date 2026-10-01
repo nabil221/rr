@@ -20,6 +20,7 @@ Detours are deliberately small interruptions to the ordered roadmap. Each gets a
 
 ## Register
 
-| ID                                       | Detour                           | Status   | Return point                     |
-| ---------------------------------------- | -------------------------------- | -------- | -------------------------------- |
-| [DET-001](DET-001-oxlint-typescript7.md) | Evaluate Oxlint and TypeScript 7 | complete | M1-02, pending user confirmation |
+| ID                                          | Detour                           | Status   | Return point                     |
+| ------------------------------------------- | -------------------------------- | -------- | -------------------------------- |
+| [DET-001](DET-001-oxlint-typescript7.md)    | Evaluate Oxlint and TypeScript 7 | complete | M1-02, pending user confirmation |
+| [DET-002](DET-002-local-ui-test-harness.md) | Bootstrap local UI verification  | complete | M4-01 verification               |
