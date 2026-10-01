@@ -1,0 +1,30 @@
+{
+    "name":  "local-stack-proof",
+    "private":  true,
+    "version":  "0.1.0",
+    "engines":  {
+                    "node":  "\u003e=24.21.0",
+                    "npm":  "\u003e=11"
+                },
+    "workspaces":  [
+                       "apps/web",
+                       "apps/desktop"
+                   ],
+    "scripts":  {
+                    "build":  "npm run build -w @local-stack-proof/web \u0026\u0026 cargo build --workspace",
+                    "dev:api":  "cargo run -p local-stack-proof-api",
+                    "dev:web":  "npm run dev -w @local-stack-proof/web",
+                    "dev:desktop":  "npm run dev -w @local-stack-proof/desktop",
+                    "build:desktop":  "npm run build -w @local-stack-proof/desktop",
+                    "format":  "prettier --write . \u0026\u0026 cargo fmt --all",
+                    "format:check":  "prettier --check . \u0026\u0026 cargo fmt --all -- --check",
+                    "lint":  "npm run lint -w @local-stack-proof/web \u0026\u0026 cargo clippy --workspace --all-targets -- -D warnings",
+                    "test":  "npm run test -w @local-stack-proof/web \u0026\u0026 cargo test --workspace",
+                    "typecheck":  "npm run typecheck -w @local-stack-proof/web",
+                    "validate":  "npm run format:check \u0026\u0026 npm run typecheck \u0026\u0026 npm run lint \u0026\u0026 npm run test \u0026\u0026 npm run build"
+                },
+    "devDependencies":  {
+                            "prettier":  "^3.9.9"
+                        }
+}
+

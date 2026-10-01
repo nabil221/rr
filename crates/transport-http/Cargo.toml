@@ -1,0 +1,20 @@
+[package]
+name = "local-stack-proof-transport-http"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+axum = "0.8.9"
+local-stack-proof-application = { path = "../application" }
+local-stack-proof-domain = { path = "../domain" }
+serde = { version = "1.0.229", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1.0.151"
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread"] }
+tower = { version = "0.5.3", features = ["util"] }
+
+[lints]
+workspace = true

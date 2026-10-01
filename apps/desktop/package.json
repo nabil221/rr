@@ -1,0 +1,14 @@
+{
+  "name": "@local-stack-proof/desktop",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "tauri dev",
+    "spike:dev": "tauri dev --config src-tauri/tauri.spike.conf.json",
+    "build": "tauri build --no-bundle",
+    "spike:build": "tauri build --no-bundle --config src-tauri/tauri.spike.conf.json"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.0"
+  }
+}
