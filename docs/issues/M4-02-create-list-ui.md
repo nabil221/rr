@@ -1,6 +1,6 @@
 # M4-02: Create and List UI
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M4-01
 
 ## Objective
@@ -22,4 +22,6 @@ Build New Run form, server-validation display, run list, and navigation to detai
 - Valid submission creates a queued persisted run.
 - The UI uses contract-generated types/client.
 
+## Evidence
 
+_Pending execution._

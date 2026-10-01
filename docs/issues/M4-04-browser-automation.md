@@ -1,6 +1,6 @@
 # M4-04: Browser Automation
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M4-03
 
 ## Objective
@@ -21,4 +21,6 @@ Add component tests plus browser automation for create, execute, inspect, reject
 - Happy and rejected end-to-end paths pass reproducibly.
 - Failure output identifies the failed stage clearly.
 
+## Evidence
 
+_Pending execution._

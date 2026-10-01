@@ -1,2 +1,1 @@
-//! Local stack proof workspace placeholder.
-
+//! Shared test helpers for the local stack proof.

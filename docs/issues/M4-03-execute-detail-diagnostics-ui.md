@@ -1,6 +1,6 @@
 # M4-03: Execute, Detail, and Diagnostics UI
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M4-02
 
 ## Objective
@@ -23,4 +23,6 @@ Build execute action, polling status refresh, configuration snapshot, event time
 - Polling stops in terminal state.
 - No secrets, paths, or stack traces appear in Diagnostics.
 
+## Evidence
 
+_Pending execution._

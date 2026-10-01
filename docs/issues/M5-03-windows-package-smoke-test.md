@@ -1,6 +1,6 @@
 # M5-03: Windows Package Smoke Test
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M5-02
 
 ## Objective
@@ -24,4 +24,6 @@ Configure package metadata/icons/logs and create a repeatable local install/laun
 - Installer prerequisites and data-retention behavior are documented.
 - Permissions are limited to what the proof actually needs.
 
+## Evidence
 
+_Pending execution._

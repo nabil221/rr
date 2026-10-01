@@ -1,6 +1,6 @@
 # M3-03: API Contract
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M3-02
 
 ## Objective
@@ -22,4 +22,6 @@ Generate/maintain OpenAPI and generated TypeScript types/client or an equally st
 - Browser client compiles from the same authoritative contract.
 - Contract validation is included in aggregate local checks.
 
+## Evidence
 
+_Pending execution._

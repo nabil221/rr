@@ -1,6 +1,6 @@
 # M4-01: React Shell and Client Boundary
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M3-03, whichever desktop transport path (M2-02 or M2-03) is selected
 
 ## Objective
@@ -22,4 +22,6 @@ Refactor the thin M1-04 screen into routes for Runs, New Run, Detail, and Diagno
 - No domain calculation is reimplemented in React.
 - Host identity is not scattered through UI code.
 
+## Evidence
 
+_Pending execution._

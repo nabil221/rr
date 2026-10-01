@@ -21,7 +21,7 @@ Both modes create, execute, inspect, and persist a deterministic demo run. The s
 
 ## Ordered backlog
 
-Follow the ordered standalone issue packets and stop at the authorized milestone boundary.
+M2 is complete, including the native desktop UI walkthrough. The user authorized M3; execution stops before M4 pending confirmation.
 
 | Order | Issue                                                                                      | Depends on                     |
 | ----: | ------------------------------------------------------------------------------------------ | ------------------------------ |
@@ -58,4 +58,3 @@ Follow the ordered standalone issue packets and stop at the authorized milestone
 - Stop at the authorized milestone boundary and obtain confirmation before starting the next milestone. Current authorization covers M3 only; M4 is not authorized.
 - Pause only for a hard-boundary change: remote services, synchronization, accounts, a technology-family replacement, paid infrastructure, real-file processing, or retaining a failed transport approach.
 - A bounded detour must be recorded in the [detour register](detours/README.md) before implementation begins. A detour never advances the ordered issue backlog or overrides an explicit milestone/issue stop.
-

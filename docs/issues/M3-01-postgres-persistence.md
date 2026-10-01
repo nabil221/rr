@@ -1,6 +1,6 @@
 # M3-01: Postgres Persistence
 
-**Status:** planned
+**Status:** in progress  
 **Dependencies:** M1-03, M0-02
 
 ## Objective
@@ -31,4 +31,6 @@ Concrete design is recorded before implementation in [ADR-002](../decisions/0002
 - Database errors map to safe application errors.
 - Schema is deliberately proof-sized, not product-scale.
 
+## Evidence
 
+_Pending execution._
