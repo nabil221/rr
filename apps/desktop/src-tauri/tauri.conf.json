@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Local Stack Proof",
+  "version": "0.1.0",
+  "identifier": "dev.localstackproof.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev -w @local-stack-proof/web -- --port 5174 --strictPort",
+    "beforeBuildCommand": "npm run build -w @local-stack-proof/web",
+    "devUrl": "http://127.0.0.1:5174",
+    "frontendDist": "../../web/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Local Stack Proof",
+        "width": 1120,
+        "height": 820,
+        "minWidth": 360,
+        "minHeight": 540
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' http://proof-api.localhost; object-src 'none'; frame-src 'none'; base-uri 'self'",
+      "devCsp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' http://proof-api.localhost ws://127.0.0.1:5174; object-src 'none'; frame-src 'none'; base-uri 'self'"
+    }
+  },
+  "bundle": { "active": false, "icon": ["icons/icon.ico", "icons/icon.png"] }
+}

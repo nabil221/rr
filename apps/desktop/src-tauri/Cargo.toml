@@ -1,0 +1,26 @@
+[package]
+name = "local-stack-proof-desktop"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]
+
+[dependencies]
+axum = "0.8.9"
+local-stack-proof-application = { path = "../../../crates/application" }
+local-stack-proof-transport-http = { path = "../../../crates/transport-http" }
+tauri = { version = "2.12.0", features = [] }
+tower = { version = "0.5.3", features = ["util"] }
+
+[dev-dependencies]
+serde_json = "1.0.151"
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread"] }
+
+[build-dependencies]
+tauri-build = { version = "2.7.0", features = [] }
+
+[lints]
+workspace = true
