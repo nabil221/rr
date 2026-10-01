@@ -11,9 +11,17 @@ Start with the [execution roadmap](docs/ROADMAP.md).
 
 The project uses standard npm workspaces. A version manager such as Volta, nvm, or the official Node installer is optional.
 
-## Try the current web proof (M1)
+## Try the current web proof (M3)
 
-This milestone deliberately uses in-memory storage so the browser-to-Rust-API path is proven before database setup. No Docker, Postgres, `.env`, or network service is needed.
+The browser-to-Rust path was first proven in memory in M1. The current web host
+stores runs in the project-owned local Postgres container. Start Docker and run:
+
+```text
+docker compose -f infra/compose.yaml up -d --wait
+```
+
+No `.env` is required: defaults target this fixture only. Optional local overrides
+are documented in `.env.example`; non-project database URLs are rejected before listening.
 
 Open two terminals at the repository root:
 
@@ -25,9 +33,12 @@ npm run dev:api
 npm run dev:web
 ```
 
-Then open <http://127.0.0.1:5173>. Create a demo run to see the UI send a request through Vite's same-origin `/api` proxy to the local Axum API, execute deterministic Rust domain logic, and render the result and lifecycle events. The app also has a deliberate validation-rejection case. The run list survives a browser refresh, but is cleared when the API process restarts because persistence is a later milestone.
+Then open <http://127.0.0.1:5173>. Create a demo run to see the UI send a request through Vite's same-origin `/api` proxy to the local Axum API, execute deterministic Rust domain logic, and render the result and lifecycle events. The app also has a deliberate validation-rejection case. Web history survives browser refresh and API restart. Stop the API with Ctrl+C for graceful shutdown.
 
-The project-scoped Postgres container is reserved for the later persistence milestone; its setup remains documented in [infra/README.md](infra/README.md).
+Container lifecycle and isolated adapter tests are documented in [infra/README.md](infra/README.md).
+The generated Rust/TypeScript contract and HTTP examples are in [docs/api-contract.md](docs/api-contract.md).
+Health reports the selected storage; it is a liveness response, not a database readiness probe.
+A process interruption after STARTED can leave a run running: durable jobs/recovery are outside this proof.
 
 ## Try the desktop proof (M2)
 

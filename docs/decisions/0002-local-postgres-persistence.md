@@ -1,6 +1,6 @@
 # ADR-002: Local Postgres Persistence
 
-**Status:** accepted for the M3-01 implementation; execution evidence pending
+**Status:** accepted and verified in M3-01
 
 ## Context
 
@@ -23,9 +23,10 @@ Integration tests create unique `stack_proof_test_*` schemas in the project data
 
 ## Evidence
 
-- The user authorized M3 and confirmed Docker availability. The engine responds; the project container has not yet been started this milestone.
+- The user authorized M3. The project Postgres container is running and healthy.
 - Current stable dependency versions and driver behavior are verified against registry and official crate documentation before installation.
-- Execution results will be recorded in M3-01 before completion.
+- All three live integration tests and aggregate workspace validation passed;
+  [M3-01](../issues/M3-01-postgres-persistence.md) records the evidence and limitations.
 
 ## Consequences
 

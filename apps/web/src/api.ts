@@ -1,52 +1,12 @@
 import { convertFileSrc, isTauri } from "@tauri-apps/api/core";
 
-export interface CreateRunRequest {
-  seed: number;
-  region: string;
-  threshold: number;
-  forceValidationFailure: boolean;
-}
+import type {
+  CreateRunRequest,
+  ErrorDto as ApiErrorDto,
+  RunDto,
+} from "./generated/api-contract";
 
-export interface RunDto {
-  id: string;
-  configuration: CreateRunRequest;
-  status: "queued" | "running" | "completed" | "rejected" | "failed";
-  result: RunResultDto | null;
-  validationMessages: ValidationMessageDto[];
-  events: RunEventDto[];
-}
-
-export interface RunResultDto {
-  totalRecords: number;
-  matchedRecords: number;
-  totalScore: number;
-  averageScore: number;
-  groups: GroupDto[];
-}
-
-export interface GroupDto {
-  category: string;
-  matchedRecords: number;
-  totalScore: number;
-  averageScore: number;
-}
-
-export interface ValidationMessageDto {
-  code: string;
-  message: string;
-  field: string | null;
-}
-
-export interface RunEventDto {
-  kind: string;
-  message: string;
-}
-
-interface ApiErrorDto {
-  code: string;
-  message: string;
-  field: string | null;
-}
+export type { CreateRunRequest, RunDto } from "./generated/api-contract";
 
 export class ApiError extends Error {
   readonly status: number;

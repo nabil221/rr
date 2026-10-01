@@ -22,7 +22,8 @@ pub trait RunRepository: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`RepositoryError::NotFound`] if no run exists, or
+    /// Returns [`RepositoryError::NotFound`] if no run exists,
+    /// [`RepositoryError::Conflict`] for a stale or invalid snapshot, or
     /// [`RepositoryError::Unavailable`] when storage cannot be accessed.
     fn save(&self, run: &Run) -> Result<(), RepositoryError>;
 
@@ -47,8 +48,9 @@ pub trait RunIdGenerator: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns a domain error if the generated value cannot be represented as a run identifier.
-    fn next_id(&self) -> Result<RunId, DomainError>;
+    /// Returns a domain error for an invalid identifier or a repository error
+    /// when a persistent identifier source is unavailable.
+    fn next_id(&self) -> Result<RunId, ServiceError>;
 }
 
 /// Monotonic, process-local identifiers for the in-memory proof stage.
@@ -74,11 +76,11 @@ impl SequentialRunIdGenerator {
 }
 
 impl RunIdGenerator for SequentialRunIdGenerator {
-    fn next_id(&self) -> Result<RunId, DomainError> {
-        RunId::new(format!(
+    fn next_id(&self) -> Result<RunId, ServiceError> {
+        Ok(RunId::new(format!(
             "run-{:06}",
             self.next.fetch_add(1, Ordering::Relaxed)
-        ))
+        ))?)
     }
 }
 
@@ -105,6 +107,12 @@ impl RunRepository for InMemoryRunRepository {
         let Some(saved) = runs.get_mut(&key) else {
             return Err(RepositoryError::NotFound(key));
         };
+        if saved.configuration() != run.configuration()
+            || run.events().len() != saved.events().len() + 1
+            || !run.events().starts_with(saved.events())
+        {
+            return Err(RepositoryError::Conflict(key));
+        }
         *saved = run.clone();
         Ok(())
     }
@@ -157,6 +165,7 @@ impl From<RepositoryError> for ServiceError {
 pub enum RepositoryError {
     AlreadyExists(String),
     NotFound(String),
+    Conflict(String),
     Unavailable,
 }
 
@@ -165,6 +174,7 @@ impl Display for RepositoryError {
         match self {
             Self::AlreadyExists(id) => write!(formatter, "run '{id}' already exists"),
             Self::NotFound(id) => write!(formatter, "run '{id}' was not found"),
+            Self::Conflict(id) => write!(formatter, "run '{id}' changed; reload before retrying"),
             Self::Unavailable => formatter.write_str("run repository is unavailable"),
         }
     }
@@ -367,6 +377,21 @@ mod tests {
             service.get(&id),
             Err(ServiceError::NotFound("missing".to_owned()))
         );
+    }
+
+    #[test]
+    fn in_memory_repository_rejects_stale_lifecycle_writes() {
+        let repository = InMemoryRunRepository::default();
+        let run = Run::new(RunId::new("run-1").unwrap(), configuration(false));
+        repository.insert(&run).unwrap();
+        let mut started = run.clone();
+        started.start().unwrap();
+        repository.save(&started).unwrap();
+        assert_eq!(
+            repository.save(&started),
+            Err(RepositoryError::Conflict("run-1".to_owned()))
+        );
+        assert_eq!(repository.get(run.id()).unwrap(), Some(started));
     }
 
     #[test]

@@ -1,22 +1,16 @@
 [package]
-name = "local-stack-proof-transport-http"
+name = "local-stack-proof-persistence-postgres"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
-axum = "0.8.9"
 local-stack-proof-application = { path = "../application" }
 local-stack-proof-domain = { path = "../domain" }
+postgres = { version = "0.19.14", features = ["with-serde_json-1"] }
 serde = { version = "1.0.229", features = ["derive"] }
-tokio = { version = "1.53.1", features = ["rt"] }
-ts-rs = "12.0.1"
-
-[dev-dependencies]
 serde_json = "1.0.151"
-tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread"] }
-tower = { version = "0.5.3", features = ["util"] }
 
 [lints]
 workspace = true

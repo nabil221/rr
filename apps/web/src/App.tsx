@@ -80,17 +80,17 @@ export function App() {
     <main className="page-shell">
       <header className="page-header">
         <p className="eyebrow">LOCAL STACK PROOF · WEB + DESKTOP</p>
-        <h1>Run the in-memory proof</h1>
+        <h1>Run the local stack proof</h1>
         <p className="lede">
-          A small frontend-to-Rust round trip. No database, account, or external
-          service is involved.
+          A small frontend-to-Rust round trip. No account or remote service is
+          involved.
         </p>
       </header>
 
       <div className="proof-note" role="note">
-        <strong>Temporary storage.</strong> Runs live in the Rust host's memory.
-        Restarting the API or desktop app clears its history; refreshing this
-        screen does not.
+        <strong>Independent local storage.</strong> Web runs persist in local
+        Postgres. Desktop runs currently live in memory and clear on app
+        restart. Refreshing this screen preserves either host's history.
       </div>
 
       <section className="workspace" aria-label="Run workspace">
@@ -108,6 +108,7 @@ export function App() {
             <input
               type="number"
               min="0"
+              max="9007199254740991"
               step="1"
               value={seed}
               onChange={(event) => setSeed(event.target.value)}
@@ -210,7 +211,7 @@ export function App() {
         <div className="panel-heading history-heading">
           <div>
             <p className="eyebrow">API READ-BACK</p>
-            <h2 id="history-heading">Runs in this host session</h2>
+            <h2 id="history-heading">Runs in this host</h2>
           </div>
           <span className="count-pill">
             {runs.length} {runs.length === 1 ? "run" : "runs"}
@@ -221,7 +222,7 @@ export function App() {
           <p className="history-empty">
             {isLoading
               ? "Loading run history…"
-              : "No runs in memory. Create one above."}
+              : "No saved runs. Create one above."}
           </p>
         ) : (
           <ul className="run-list">
@@ -252,7 +253,7 @@ export function App() {
         <span className="footer-connector" aria-hidden="true" />
         <span>Application service</span>
         <span className="footer-connector" aria-hidden="true" />
-        <span>In-memory repository</span>
+        <span>Local repository</span>
       </footer>
     </main>
   );
