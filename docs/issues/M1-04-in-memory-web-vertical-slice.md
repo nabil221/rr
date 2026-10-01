@@ -1,6 +1,6 @@
 # M1-04: In-Memory Web Vertical Slice
 
-**Status:** planned
+**Status:** complete  
 **Dependencies:** M1-03
 
 ## Objective
@@ -32,7 +32,17 @@ Build a deliberately thin local web slice: React form and result view, Axum rout
 - Replacing the in-memory repository later does not require changing computation or screen contracts.
 - The UI clearly labels this as a temporary in-memory proof.
 
+## Evidence
+
+- `npm run validate` passed: formatting, TypeScript, Oxlint, Vitest, all Rust tests and Clippy, plus production builds.
+- The browser page is served by Vite on `127.0.0.1:5173`; the Vite `/api` proxy forwards to Axum on `127.0.0.1:3000`. `GET /api/health` through Vite returned `{ "status": "ok", "storage": "in-memory" }`.
+- Exercised the same same-origin API endpoints used by the React client through Vite: create returned `queued`; execute returned `completed` with 24 generated records, 7 matches, deterministic grouped metrics, and created/started/completed events; list returned the run.
+- Exercised the controlled validation path through Vite: execute returned `rejected` with one user-readable validation message.
+- Restarted the API and confirmed `GET /api/runs` returned an empty list. Browser refresh is not expected to clear history; API process restart does.
+- The production web bundle built successfully. Chrome UI verification completed on 2026-09-30: clicked Create and execute run with seed 42, North, and threshold 0; `run-000019` displayed completed, 24 generated records, 7 matches, average 64.14, category breakdown, and created/started/completed lifecycle events. Inspected the rendered result in a browser screenshot.
+- Checked Force a controlled validation rejection and submitted from the UI; `run-000020` displayed rejected, a readable validation message, and created/started/rejected lifecycle events.
+- Reloaded the page: all 20 session runs remained visible, including both new runs. Selected `run-000019` from history and confirmed its result rendered again. No warnings or errors were captured in the Chrome tab console during the walkthrough. Existing session history was preserved.
+
 ## Run locally
 
 In two terminals at the repository root, run `npm run dev:api` and `npm run dev:web`, then open <http://127.0.0.1:5173>.
-
