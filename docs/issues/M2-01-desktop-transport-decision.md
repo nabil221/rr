@@ -1,6 +1,6 @@
 # M2-01: Desktop Transport Decision
 
-**Status:** planned
+**Status:** complete  
 **Dependencies:** M1-04
 
 ## Objective
@@ -27,4 +27,9 @@ Create ADR-001 and a time-boxed spike plan. Preferred option is embedded Axum; f
 - The spike has a bounded scope and fallback.
 - No future UI issue assumes an unproven transport.
 
+## Evidence
 
+- [ADR-001](../decisions/0001-desktop-transport.md) defines the preferred asynchronous custom-protocol -> shared Axum router path and the command-adapter fallback.
+- Criteria cover development/production WebView2, error status/JSON, strict origins, process-free adapter tests, request logs, no listening sockets, and shared frontend/application code.
+- Cancellation is explicitly limited to aborting the fetch wait; progress uses the existing lifecycle/status contract. Neither introduces unrelated business functionality.
+- The bounded spike must precede connecting the React desktop flow; installer work remains in M5. Stable dependency versions were verified before implementation.

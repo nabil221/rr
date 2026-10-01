@@ -1,6 +1,6 @@
 # M3-02: Axum API
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M3-01, M1-04
 
 ## Objective
@@ -23,4 +23,6 @@ Finalize health, create, execute, list, and detail routes; transport DTOs; reque
 - Unexpected failure returns a safe 5xx envelope.
 - Handlers delegate all calculation to application services.
 
+## Evidence
 
+_Pending execution._

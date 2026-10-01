@@ -1,6 +1,6 @@
 # M2-03: Fallback Desktop Transport
 
-**Status:** planned
+**Status:** complete (conditional issue skipped; M2-02 passed)  
 **Dependencies:** M2-02 failure
 
 ## Objective
@@ -21,4 +21,6 @@ Implement only the command mapping and client adapter required by the spike; do 
 - React screens do not contain Tauri-specific business branches.
 - ADR-001 documents the router rejection and fallback evidence.
 
+## Evidence
 
+The embedded-router spike passed in development and production. ADR-001 accepts that path, so no command fallback is implemented. Reopen this conditional issue only if new reproducible evidence invalidates the selected transport.

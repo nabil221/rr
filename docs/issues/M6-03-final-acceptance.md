@@ -1,6 +1,6 @@
 # M6-03: Final Acceptance and Cleanup
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M6-01; M6-02 if selected
 
 ## Objective
@@ -22,4 +22,6 @@ Run all local checks, remove dead spike code, audit dependencies, refresh archit
 - No known failures are hidden or waived without an explicit limitation.
 - Another developer can reproduce browser and desktop proof without external services.
 
+## Evidence
 
+_Pending execution._

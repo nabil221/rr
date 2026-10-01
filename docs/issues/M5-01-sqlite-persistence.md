@@ -1,6 +1,6 @@
 # M5-01: SQLite Persistence
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M2-04
 
 ## Objective
@@ -22,4 +22,6 @@ Implement SQLite migrations, repository mapping, per-user application-data locat
 - Tests can create isolated data without touching ordinary user data.
 - No desktop operation requires Postgres or network access.
 
+## Evidence
 
+_Pending execution._

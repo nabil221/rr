@@ -1,6 +1,6 @@
 # M6-02: Optional Local PWA
 
-**Status:** planned
+**Status:** planned; optional  
 **Dependencies:** M6-01
 
 ## Objective
@@ -22,4 +22,6 @@ Add manifest, icons, supported-browser local install affordance, conservative sh
 - Offline mode never claims a server-backed run was created or completed.
 - Browser-specific limitations are recorded in proof matrix.
 
+## Evidence
 
+_Pending execution._

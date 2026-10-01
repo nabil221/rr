@@ -1,0 +1,13 @@
+{
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Local Stack Proof - Transport Spike",
+        "url": "desktop-spike.html",
+        "width": 900,
+        "height": 650
+      }
+    ]
+  }
+}

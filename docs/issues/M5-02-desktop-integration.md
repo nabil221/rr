@@ -1,6 +1,6 @@
 # M5-02: Desktop Integration
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M5-01, M4-01, whichever desktop transport path (M2-02 or M2-03) is selected
 
 ## Objective
@@ -22,4 +22,6 @@ Implement selected transport client, Tauri host configuration, production React 
 - Diagnostics identifies desktop-local/SQLite.
 - The desktop build starts without a network connection or Node server runtime.
 
+## Evidence
 
+_Pending execution._

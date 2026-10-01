@@ -1,6 +1,6 @@
 # M6-01: Evidence and Demo
 
-**Status:** planned
+**Status:** planned  
 **Dependencies:** M4-04, M5-03
 
 ## Objective
@@ -22,4 +22,6 @@ Complete proof matrix and write a local demo script covering setup, happy flow, 
 - Desktop demo runs with web API and Postgres stopped.
 - No step requires an external account or service.
 
+## Evidence
 
+_Pending execution._
