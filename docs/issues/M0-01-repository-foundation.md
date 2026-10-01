@@ -1,6 +1,6 @@
 # M0-01: Repository Foundation
 
-**Status:** planned
+**Status:** complete  
 **Dependencies:** none
 
 ## Objective
@@ -30,4 +30,13 @@ Create Cargo/npm workspaces, `apps/web`, `apps/api`, `apps/desktop`, crate place
 - One documented command runs the full local validation set.
 - No global JavaScript tool beyond the documented runtime/package manager is needed.
 
+## Evidence
 
+- `cargo fmt --all -- --check` passed.
+- `cargo clippy --workspace --all-targets -- -D warnings` passed.
+- `cargo test --workspace` passed.
+- `npm run validate` passed for the completed foundation; the current toolchain update is evidenced separately in DET-001.
+- Frontend Vitest: 1 test passed.
+- Frontend production build and all Rust workspace binaries built successfully.
+- Current version audit after DET-001: Node 24.21.0, npm 12.1.0, Vite 8.3.1, React 19.3.0, Vitest 5.0.2, Oxlint 1.86.0, TypeScript 7.0.2, and Rust 1.98.1.
+- TypeScript 7 exposed its stricter side-effect import check for the CSS import; `src/vite-env.d.ts` now loads Vite's asset declarations. The updated toolchain passes the full validation command.
