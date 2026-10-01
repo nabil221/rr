@@ -1,6 +1,6 @@
 # M1-02: Deterministic Computation
 
-**Status:** planned
+**Status:** complete  
 **Dependencies:** M1-01
 
 ## Objective
@@ -30,4 +30,9 @@ Use seed, region, threshold, and forced-failure inputs to generate synthetic rec
 - Calculation has no clock, filesystem, database, or network dependency.
 - Happy and rejected fixtures are easy to read and stable.
 
+## Evidence
 
+- `cargo test -p local-stack-proof-domain` passed: 7 tests, including a fixed seed `42` / region `north` fixture (`24` generated, `7` matched, total score `449`, average `449/7`) and stable category aggregates.
+- The same suite verifies repeatability, threshold rejection, empty-region rejection, and forced rejection as `ValidationMessage` rather than a panic.
+- `cargo clippy -p local-stack-proof-domain --all-targets -- -D warnings` passed.
+- `calculate` is deterministic and depends only on its configuration; no clock, filesystem, database, network, or external crate is used.

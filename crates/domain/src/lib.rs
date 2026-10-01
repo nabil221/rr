@@ -1,5 +1,8 @@
 //! Framework-free domain types and rules for the local stack proof.
 
+mod computation;
+pub use computation::calculate;
+
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -358,4 +361,3 @@ mod tests {
         assert!(run.start().is_err());
     }
 }
-
