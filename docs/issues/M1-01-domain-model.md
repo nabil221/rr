@@ -1,6 +1,6 @@
 # M1-01: Domain Model
 
-**Status:** planned
+**Status:** complete  
 **Dependencies:** M0-01
 
 ## Objective
@@ -29,4 +29,8 @@ Implement IDs, configuration, status, events, result, validation messages, and l
 - Invalid transitions return a domain error or are impossible to represent.
 - The crate has no transport, host, or database dependency.
 
+## Evidence
 
+- `cargo test -p local-stack-proof-domain`: 4 lifecycle and invariant tests passed.
+- `cargo clippy -p local-stack-proof-domain --all-targets -- -D warnings`: passed.
+- `cargo fmt --all`: applied; formatting check passed in the final validation.
