@@ -1,6 +1,6 @@
 # M1-03: Application Services
 
-**Status:** planned
+**Status:** complete  
 **Dependencies:** M1-01, M1-02
 
 ## Objective
@@ -29,4 +29,10 @@ Define repository interfaces and in-memory implementations for tests; persist li
 - Every terminal state is persisted.
 - Tests run with no processes or containers.
 
+## Evidence
 
+- `RunService` implements create, execute, retrieve, and list use-cases through `RunRepository`; ID creation is isolated behind `RunIdGenerator`.
+- `InMemoryRunRepository` stores complete snapshots under a mutex and returns stable ID ordering. Created, started, and terminal snapshots are saved at each transition.
+- `cargo test -p local-stack-proof-application` passed: 5 tests covering completed and rejected flows, saved event order/content, retrieve/list, repeated execution rejection, and missing IDs.
+- `cargo clippy -p local-stack-proof-application --all-targets -- -D warnings` passed.
+- Application crate dependencies remain limited to the domain crate; no processes or containers are needed.
