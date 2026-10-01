@@ -29,6 +29,11 @@ pub fn router(runs: RunService) -> Router {
     compose(runs, "in-memory").layer(axum::middleware::from_fn(boundary::request_id))
 }
 
+/// Compose the persistent desktop host; its protocol adapter owns origin checks.
+pub fn desktop_router(runs: RunService) -> Router {
+    compose(runs, "sqlite").layer(axum::middleware::from_fn(boundary::request_id))
+}
+
 /// Compose the persistent web host with its exact local-origin boundary.
 pub fn web_router(runs: RunService) -> Router {
     compose(runs, "postgres")

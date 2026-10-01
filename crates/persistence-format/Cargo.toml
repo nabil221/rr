@@ -1,5 +1,5 @@
 [package]
-name = "local-stack-proof-persistence-postgres"
+name = "local-stack-proof-persistence-format"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
@@ -8,8 +8,7 @@ license.workspace = true
 [dependencies]
 local-stack-proof-application = { path = "../application" }
 local-stack-proof-domain = { path = "../domain" }
-postgres = { version = "0.19.14", features = ["with-serde_json-1"] }
-local-stack-proof-persistence-format = { path = "../persistence-format" }
+serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 
 [lints]

@@ -16,6 +16,7 @@
     "dev:web": "npm run dev -w @local-stack-proof/web",
     "dev:desktop": "npm run dev -w @local-stack-proof/desktop",
     "build:desktop": "npm run build -w @local-stack-proof/desktop",
+    "package:desktop": "npm run package -w @local-stack-proof/desktop",
     "spike:desktop": "npm run spike:dev -w @local-stack-proof/desktop",
     "build:desktop:spike": "npm run spike:build -w @local-stack-proof/desktop",
     "format": "prettier --write . && cargo fmt --all",

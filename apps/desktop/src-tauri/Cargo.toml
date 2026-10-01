@@ -11,11 +11,14 @@ custom-protocol = ["tauri/custom-protocol"]
 [dependencies]
 axum = "0.8.9"
 local-stack-proof-application = { path = "../../../crates/application" }
+local-stack-proof-persistence-sqlite = { path = "../../../crates/persistence-sqlite" }
 local-stack-proof-transport-http = { path = "../../../crates/transport-http" }
 tauri = { version = "2.12.0", features = [] }
 tower = { version = "0.5.3", features = ["util"] }
 
 [dev-dependencies]
+local-stack-proof-domain = { path = "../../../crates/domain" }
+tempfile = "3.27.0"
 serde_json = "1.0.151"
 tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread"] }
 

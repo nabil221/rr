@@ -64,3 +64,8 @@ and always uses the embedded protocol. UI code does not branch on host identity.
 The native development CLI overrides Vite to port 5174; the web default is strict 5173
 to match its exact-origin policy. A new native packaged walkthrough belongs to M5;
 headless browser/component checks do not substitute for that acceptance evidence.
+
+For SQLite/native tests and actual Windows installer verification, see
+[desktop testing](desktop-testing.md). SQLite tests need no Docker; the installed
+package smoke deliberately runs with project servers stopped, then restores Postgres
+before the full web regression suite. Installation and run data are kept separate.

@@ -171,4 +171,85 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::PAYLOAD_TOO_LARGE);
     }
+
+    async fn sqlite_call(
+        router: &Router,
+        method: Method,
+        path: &str,
+        body: serde_json::Value,
+    ) -> (StatusCode, serde_json::Value) {
+        let request = Request::builder()
+            .method(method)
+            .uri(format!("http://proof-api.localhost{path}"))
+            .header(header::ORIGIN, "http://tauri.localhost")
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(if body.is_null() {
+                Vec::new()
+            } else {
+                serde_json::to_vec(&body).unwrap()
+            })
+            .unwrap();
+        let response = dispatch(router.clone(), request).await;
+        (
+            response.status(),
+            serde_json::from_slice(response.body()).unwrap(),
+        )
+    }
+
+    #[tokio::test]
+    async fn native_sqlite_contract_survives_host_recomposition() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("runs.sqlite3");
+        let repository =
+            local_stack_proof_persistence_sqlite::SqliteRunRepository::open(&path).unwrap();
+        let router = local_stack_proof_transport_http::desktop_router(repository.service());
+        let (status, health) =
+            sqlite_call(&router, Method::GET, "/api/health", serde_json::Value::Null).await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(health["storage"], "sqlite");
+        let (status, invalid) = sqlite_call(&router, Method::POST, "/api/runs", serde_json::json!({"seed":42,"region":" ","threshold":0,"forceValidationFailure":false})).await;
+        assert_eq!(status, StatusCode::BAD_REQUEST);
+        assert_eq!(invalid["field"], "region");
+        let mut saved = Vec::new();
+        for reject in [false, true] {
+            let (status, queued) = sqlite_call(&router, Method::POST, "/api/runs", serde_json::json!({"seed":42,"region":"north","threshold":0,"forceValidationFailure":reject})).await;
+            assert_eq!(status, StatusCode::CREATED);
+            assert_eq!(queued["status"], "queued");
+            let id = queued["id"].as_str().unwrap();
+            let (status, terminal) = sqlite_call(
+                &router,
+                Method::POST,
+                &format!("/api/runs/{id}/execute"),
+                serde_json::Value::Null,
+            )
+            .await;
+            assert_eq!(status, StatusCode::OK);
+            assert_eq!(
+                terminal["status"],
+                if reject { "rejected" } else { "completed" }
+            );
+            assert_eq!(terminal["events"].as_array().unwrap().len(), 3);
+            saved.push(terminal);
+        }
+        drop(router);
+        let reopened = local_stack_proof_transport_http::desktop_router(
+            local_stack_proof_persistence_sqlite::SqliteRunRepository::open(&path)
+                .unwrap()
+                .service(),
+        );
+        for terminal in &saved {
+            let (status, fetched) = sqlite_call(
+                &reopened,
+                Method::GET,
+                &format!("/api/runs/{}", terminal["id"].as_str().unwrap()),
+                serde_json::Value::Null,
+            )
+            .await;
+            assert_eq!(status, StatusCode::OK);
+            assert_eq!(&fetched, terminal);
+        }
+        let (_, history) =
+            sqlite_call(&reopened, Method::GET, "/api/runs", serde_json::Value::Null).await;
+        assert_eq!(history, serde_json::json!(saved));
+    }
 }
